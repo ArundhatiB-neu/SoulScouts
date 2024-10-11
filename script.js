@@ -18,6 +18,16 @@ var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
   return new bootstrap.Tooltip(tooltipTriggerEl);
 });
 
+// spinner
+window.addEventListener('load', function() {
+    const spinner = document.getElementById('spinner');
+    const content = document.getElementById('content');
+    setTimeout(() => {
+        spinner.style.display = 'none';
+        content.style.display = 'block';
+    }, 1500); // 1.5 seconds
+});
+
 function validateFormControls(event){
     var value = event.target.value;
     var targetId = event.target.id;
