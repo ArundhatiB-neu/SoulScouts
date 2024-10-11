@@ -4,9 +4,9 @@ body{
     font-family: "Poppins", sans-serif;
 }
 
-.box-area{
+/* .box-area{
     width: 930px;
-}
+} */
 
 .right-box{
     padding: 40px 30px 40px 40px;
@@ -20,8 +20,16 @@ body{
     display: none;
     color: red;
 }
-
-@media only screen and (max-width: 768px){
+.form-label{
+    font-size: 0.8rem;
+}
+.input-group{
+    flex-direction: column;
+}
+.modal-content{
+    align-items: center;
+}
+@media only screen and (max-width: 992px){
     .box-area{
         margin: 0 10px;
     }
@@ -34,4 +42,8 @@ body{
     .right-box{
         padding: 20px;
     }
+    .left-box{
+        display: none!important;
+    }
+    
 }
