@@ -50,7 +50,13 @@
             <li class="nav-item why-margin">
               <a class="nav-link" href="#whyHeading">Why Us</a>
             </li>
-            <li class="nav-item dropdown">
+            <li class="nav-item">
+              <button class="btn btn-info" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample"
+                aria-controls="offcanvasExample">
+                Tools for Tranquility
+              </button>
+            </li>
+            <!-- <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 Our features
               </a>
@@ -59,7 +65,7 @@
                 <li><a class="dropdown-item" href="#crisis">Crisis Mode</a></li>
                 <li><a class="dropdown-item" href="#perso">Personalization</a></li>
               </ul>
-            </li>
+            </li> -->
           </ul>
           <form class="d-flex" role="search">
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
@@ -71,6 +77,27 @@
           </div>
           </nav>
 
+          <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
+            <div class="offcanvas-header">
+              <h5 class="offcanvas-title" id="offcanvasExampleLabel">Your Mental Strength Kit
+              </h5>
+              <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+              <div>
+                Everything you need to nurture and strengthen your mental health. </div>
+              <div class="dropdown mt-3">
+                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                  Wellness Wonders
+                </button>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="#mood" data-bs-dismiss="offcanvas">Mood tracking</a></li>
+                  <li><a class="dropdown-item" href="#crisis" data-bs-dismiss="offcanvas">Crisis Mode</a></li>
+                  <li><a class="dropdown-item" href="#perso" data-bs-dismiss="offcanvas">Personalization</a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
 
       <!-- navigation ends  -->
       
