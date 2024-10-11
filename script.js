@@ -12,6 +12,12 @@ var isSignupConfirmPasswordValid = false;
 var emailValue;
 var signupButton;
 
+// tooltip
+var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+  return new bootstrap.Tooltip(tooltipTriggerEl);
+});
+
 function validateFormControls(event){
     var value = event.target.value;
     var targetId = event.target.id;
