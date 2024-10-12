@@ -45,7 +45,7 @@ body{
 
 /* casserole container styles start */
 .casserole-container{
-    width: 1200px;
+    width: 90%;
     margin:50px auto;
     /* background-color: red; */
 }
@@ -61,7 +61,7 @@ margin: auto 0;;
 
 /* why-container  start*/
 .why-container{
-    width: 1200px;
+    width: 90%;
     margin:50px auto;
     /* background-color: red; */
 }
@@ -78,7 +78,7 @@ margin: auto 0;;
 
 /* apart-container start */
 .apart-container{
-    width: 1200px;
+    width: 90%;
     margin:50px auto;
 }
 .apart-text h4{
@@ -86,6 +86,12 @@ margin: auto 0;;
 }
 .apart-text ul li:not(:last-child){
     margin-bottom: 30px;
+}
+
+.apart-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 /* apart-container end */
 
