@@ -2,11 +2,63 @@
 
 body{
     font-family: "Poppins", sans-serif;
+    background-color: white;
 }
 
-/* .box-area{
-    width: 930px;
-} */
+.faq-list {
+    max-width: 800px;
+    margin: 0 auto;
+}
+.faq-item {
+    border: 1px solid #e0e0ff;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    overflow: hidden;
+}
+.faq-item.active {
+    border-color: #3366cc;
+}
+.faq-question {
+    background-color: #fff;
+    color: #3366cc;
+    padding: 1rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 500;
+}
+.faq-answer {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    color: #6c757d;
+}
+.faq-item.active .bi-chevron-right::before {
+    content: "\f282";
+}
+
+.pricing-section {
+    background-color: #1a2b47;
+    color: white;
+    border-radius: 15px;
+    padding: 2rem;
+}
+.pricing-card {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    height: 100%;
+}
+.pricing-card.highlight {
+    background-color: #3366cc;
+}
+.faq-section {
+    background-color: white;
+    border-radius: 15px;
+}
+.footer {
+    background-color: #1a2b47;
+    color: white;
+}
 
 .right-box{
     padding: 40px 30px 40px 40px;
