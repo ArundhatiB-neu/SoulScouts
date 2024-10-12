@@ -103,6 +103,7 @@ function onLogin(){
     modalInstance.hide(); 
 
     alert(phrase);
+
 }
 
 function onSignup(){
@@ -116,12 +117,13 @@ function onSignup(){
     alert(phrase);
 }
 
-
-
-
-
-
-
+ // Toast JS
+function googleSignUp(){
+    const toastLiveExample = document.getElementById('liveToast')
+    const toastBootstrap = bootstrap.Toast.getOrCreateInstance(toastLiveExample)
+    toastBootstrap.show()
+}
+   
 
 // Function to toggle between login and sign up forms
 function toggleForm(e) {
@@ -138,39 +140,47 @@ function toggleForm(e) {
         modalTitle.innerText = "Join Us!";
         modalSubtitle.innerText = "Create an account to get started!";
         formContent.innerHTML = `
-            <div class="input-group mb-3">
+            <div class="mb-3">
+              <label for="signupName" class="form-label">Full Name</label>
               <input type="text" class="form-control form-control-lg bg-light fs-6" id="signupName" placeholder="Enter your name...">
+              <p class="error" id="error-signupName">Please enter valid name.</p>
             </div>
-            <p class="error" id="error-signupName">Please enter valid name.</p>
-
-            <div class="input-group mb-3">
+            
+            <div class="mb-3">
+              <label for="signupEmail" class="form-label">Email Address</label>
               <input type="text" class="form-control form-control-lg bg-light fs-6" id="signupEmail" placeholder="Enter your email address...">
+              <p class="error" id="error-signupEmail">Please enter valid email.</p>
             </div>
-            <p class="error" id="error-signupEmail">Please enter valid email.</p>
+            
 
-            <div class="input-group mb-3 d-flex justify-content-between align-items-center">
-                <label for="dob" class="ms-2 me-4"><small>Date of Birth</small></label>
+            <div class="mb-3">
+                <label for="dob" class="form-label me-4">Date of Birth</label>
                 <input type="date" name="dob" class="form-control form-control-lg bg-light fs-6" id="signupDob" placeholder="Enter date of birth">
+                <p class="error" id="error-signupDob">You must be at least 11 years old to sign up.</p>
             </div>
-            <p class="error" id="error-signupDob">You must be at least 11 years old to sign up.</p>
+            
 
-            <div class="input-group mb-3">
+            <div class="mb-3">
+                <label for="signupPassword" class="form-label">Create Password</label>
               <input type="password" class="form-control form-control-lg bg-light fs-6" id="signupPassword" placeholder="Enter a password...">
+              <p class="error" id="error-signupPassword">Your password must be at least 8 characters and contain at least one of the following: lowercase character, uppercase character, number, special character.</p>
             </div>
-            <p class="error" id="error-signupPassword">Your password must be at least 8 characters and contain at least one of the following: lowercase character, uppercase character, number, special character.</p>
+            
 
-            <div class="input-group mb-3">
+            <div class="mb-3">
+              <label for="signupConfirmPassword" class="form-label">Confirm Password</label>
               <input type="password" class="form-control form-control-lg bg-light fs-6" id="signupConfirmPassword" placeholder="Confirm password...">
+              <p class="error" id="error-signupConfirmPassword">Password fields don't match.</p>
             </div>
-            <p class="error" id="error-signupConfirmPassword">Password fields don't match.</p>
+            
 
-            <div class="input-group mt-3 mb-3">
+            <div class="mt-3 mb-3">
                 <button class="btn btn-lg btn-primary w-100 fs-6" id="signupButton" onclick="onSignup()">
                     Sign Up
                 </button>
             </div>
-            <div class="input-group mb-3">
-                <button class="btn btn-lg btn-light w-100 fs-6">
+            <div class="mb-3">
+                <button class="btn btn-lg btn-light w-100 fs-6" id="googleButton" onclick="googleSignUp()">
                     <img src="assets/google.png" style="width: 20px" class="me-2" />
                     <small>Sign Up with Google</small>
                 </button>
@@ -202,13 +212,15 @@ function toggleForm(e) {
         modalTitle.innerText = "Hello Again!";
         modalSubtitle.innerText = "We are so happy to have you back!";
         formContent.innerHTML = `
-            <div class="input-group mb-3">
+            <div class="mb-3">
+              <label for="loginEmail" class="form-label">Email Address</label>
               <input type="text" id="loginEmail" class="form-control form-control-lg bg-light fs-6" placeholder="Enter your email address...">
             </div>
-            <div class="input-group mb-1">
+            <div class="mb-1">
+              <label for="loginPassword" class="form-label">Password</label> 
               <input type="password" id="loginPassword" class="form-control form-control-lg bg-light fs-6" placeholder="Enter your password...">
             </div>
-            <div class="input-group mb-5 d-flex justify-content-between">
+            <div class="mb-5 d-flex justify-content-between">
               <div class="form-check">
                 <input type="checkbox" class="form-check-input" id="formCheckbox">
                 <label for="formCheckbox" class="form-check-label text-secondary"><small>Remember Me</small></label>
@@ -217,13 +229,13 @@ function toggleForm(e) {
                 <small><a href="#">Forgot Password?</a></small>
               </div>
             </div>
-            <div class="input-group mb-3">
-                <button class="btn btn-lg btn-primary w-100 fs-6" id="loginButton">
+            <div class="mb-3">
+                <button class="btn btn-lg btn-primary w-100 fs-6" id="loginButton" onclick="onLogin()">
                     Login
                 </button>
             </div>
-            <div class="input-group mb-3">
-                <button class="btn btn-lg btn-light w-100 fs-6" onclick="onLogin()">
+            <div class="mb-3">
+                <button class="btn btn-lg btn-light w-100 fs-6" id="googleButton" onclick="googleSignUp()">
                     <img src="assets/google.png" style="width: 20px" class="me-2" />
                     <small>Sign in with Google</small>
                 </button>
