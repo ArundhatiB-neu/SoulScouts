@@ -12,6 +12,43 @@ var isSignupConfirmPasswordValid = false;
 var emailValue;
 var signupButton;
 
+// tooltip
+var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+  return new bootstrap.Tooltip(tooltipTriggerEl);
+});
+
+// spinner
+window.addEventListener('load', function() {
+    const spinner = document.getElementById('spinner');
+    const content = document.getElementById('content');
+    setTimeout(() => {
+        spinner.style.display = 'none';
+        content.style.display = 'block';
+    }, 1500); // 1.5 seconds
+});
+
+// live alert
+const alertPlaceholder = document.getElementById('liveAlertPlaceholder')
+const appendAlert = (message, type) => {
+  const wrapper = document.createElement('div')
+  wrapper.innerHTML = [
+    `<div class="alert alert-${type} alert-dismissible" role="alert">`,
+    `   <div>${message}</div>`,
+    '   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
+    '</div>'
+  ].join('')
+
+  alertPlaceholder.append(wrapper)
+}
+
+const alertTrigger = document.getElementById('liveAlertBtn')
+if (alertTrigger) {
+  alertTrigger.addEventListener('click', () => {
+    appendAlert('Great to see your Interest, Please Signup to Begin the Journey ! ', 'success')
+  })
+}
+
 function validateFormControls(event){
     var value = event.target.value;
     var targetId = event.target.id;
