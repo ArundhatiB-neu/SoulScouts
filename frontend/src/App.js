@@ -5,6 +5,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import HRDashboard from "./pages/HR/Dashboard/Dashboard";
 import Settings from "./pages/Miscellaneous/Settings/Settings";
 import ResourceLibrary from "./pages/Miscellaneous/ResourceLibrary/ResourceLibrary";
+import CompanyManagement from "./pages/Admin/CompanyManagement/CompanyManagement";
 import { Provider } from "react-redux";
 import store from "./redux/store";
 
@@ -34,6 +35,7 @@ const App = () => {
           <Route path="/hr-dashboard" element={<HRDashboard/>}/>
           <Route path="/settings" element={<Settings/>}/>
           <Route path="/library" element={<ResourceLibrary/>}/>
+          <Route path="/company-management" element={<CompanyManagement/>}/>
         </Routes>
       </Router>
     </Provider>
