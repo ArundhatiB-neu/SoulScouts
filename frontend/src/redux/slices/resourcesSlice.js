@@ -6,7 +6,6 @@ export const resourcesSlice = createSlice({
     list: [],
     categories: [
       { value: 'mindfulness', label: 'Mindfulness' },
-      { value: 'destress', label: 'Destress' },
       { value: 'relaxation', label: 'Relaxation' },
       { value: 'meditation', label: 'Meditation' },
       { value: 'focus', label: 'Focus Music' },
