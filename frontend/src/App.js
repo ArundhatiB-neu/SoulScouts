@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Miscellaneous/Home/Home";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import HRDashboard from "./pages/HR/Dashboard/Dashboard";
+import Settings from "./pages/Miscellaneous/Settings/Settings";
 
 const App = () => {
   useEffect(() => {
@@ -26,7 +27,8 @@ const App = () => {
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/hrdashboard" element={<HRDashboard/>}/>
+        <Route path="/hr-dashboard" element={<HRDashboard/>}/>
+        <Route path="/settings" element={<Settings/>}/>
       </Routes>
     </Router>
   );

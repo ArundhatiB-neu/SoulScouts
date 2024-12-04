@@ -5,7 +5,7 @@ import logo from '../../Assets/soulscouts-logo.png';
 
 const Navigation = () => {
   //const userRole = useSelector(state => state.auth.role);
-  const userRole = "employee";
+  const userRole = "HR";
   
   const navLinks = {
     HR: [
