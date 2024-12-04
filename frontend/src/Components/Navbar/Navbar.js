@@ -5,15 +5,13 @@ import logo from '../../Assets/soulscouts-logo.png';
 
 const Navigation = () => {
   //const userRole = useSelector(state => state.auth.role);
-  const userRole = "HR";
+  const userRole = "admin";
   
   const navLinks = {
     HR: [
       { title: 'HR Dashboard', path: '/hr-dashboard' },
       { title: 'HR Settings', path: '/hr-settings' },
       { title: 'Employee Management', path: '/employee-management' },
-      { title: 'Coach Management', path: '/coach-management' },
-      { title: 'Resource Library Management', path: '/resource-management' },
       { title: 'Manage Subscription', path: '/subscription' },
       { title: 'Logout', path: '/logout' }
     ],
@@ -21,12 +19,17 @@ const Navigation = () => {
       { title: 'Employee Dashboard', path: '/employee-dashboard' },
       { title: 'Employee Settings', path: '/employee-settings' },
       { title: 'Resource Library', path: '/resources' },
-      { title: 'Journal', path: '/journal' },
       { title: 'Logout', path: '/logout' }
     ],
     coach: [
       { title: 'Coach Dashboard', path: '/coach-dashboard' },
       { title: 'Coach Settings', path: '/coach-settings' },
+      { title: 'Resource Library', path: '/resources' },
+      { title: 'Logout', path: '/logout' }
+    ],
+    admin: [
+      { title: 'Coach Management', path: '/coach-management' },
+      { title: 'Company Management', path: '/company-management' },
       { title: 'Resource Library', path: '/resources' },
       { title: 'Logout', path: '/logout' }
     ]
@@ -38,8 +41,8 @@ const Navigation = () => {
         <img src={logo} alt="Logo" height="40" />
       </Navbar.Brand>
       <div className="ms-auto">
-        <NavDropdown 
-          title="Links" 
+        <NavDropdown
+          title="Links"
           id="nav-dropdown"
           align="end"
         >

@@ -8,7 +8,7 @@ const Settings = () => {
   // const userRole = useSelector(state => state.auth.role);
   // const dispatch = useDispatch();
 
-  const userRole = "employee";
+  const userRole = "hr";
   const user = {};
 
   const [formData, setFormData] = useState({

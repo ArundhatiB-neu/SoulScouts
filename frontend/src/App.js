@@ -4,6 +4,9 @@ import Home from "./pages/Miscellaneous/Home/Home";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import HRDashboard from "./pages/HR/Dashboard/Dashboard";
 import Settings from "./pages/Miscellaneous/Settings/Settings";
+import ResourceLibrary from "./pages/Miscellaneous/ResourceLibrary/ResourceLibrary";
+import { Provider } from "react-redux";
+import store from "./redux/store";
 
 const App = () => {
   useEffect(() => {
@@ -24,13 +27,16 @@ const App = () => {
   }, []);
 
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/hr-dashboard" element={<HRDashboard/>}/>
-        <Route path="/settings" element={<Settings/>}/>
-      </Routes>
-    </Router>
+    <Provider store={store}>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/hr-dashboard" element={<HRDashboard/>}/>
+          <Route path="/settings" element={<Settings/>}/>
+          <Route path="/library" element={<ResourceLibrary/>}/>
+        </Routes>
+      </Router>
+    </Provider>
   );
 };
 
