@@ -3,7 +3,23 @@ import { createSlice } from '@reduxjs/toolkit';
 export const companySlice = createSlice({
   name: 'companies',
   initialState: {
-    list: [],
+    list: [{
+      id: 1,
+      name: "Google",
+      email: "support@google.com",
+      domain: "@google.com",
+      phone: "+11234512345",
+      address: "Mountain View, CA"
+    },
+    {
+      id: 2,
+      name: "Amazon",
+      email: "support@amazon.com",
+      domain: "@amazon.com",
+      phone: "+11234512876",
+      address: "Bangalore, India"
+    }
+  ],
     loading: false,
     error: null
   },

@@ -6,6 +6,7 @@ import HRDashboard from "./pages/HR/Dashboard/Dashboard";
 import Settings from "./pages/Miscellaneous/Settings/Settings";
 import ResourceLibrary from "./pages/Miscellaneous/ResourceLibrary/ResourceLibrary";
 import CompanyManagement from "./pages/Admin/CompanyManagement/CompanyManagement";
+import CoachManagement from "./pages/Admin/CoachManagement/CoachManagement";
 import { Provider } from "react-redux";
 import store from "./redux/store";
 
@@ -36,6 +37,7 @@ const App = () => {
           <Route path="/settings" element={<Settings/>}/>
           <Route path="/library" element={<ResourceLibrary/>}/>
           <Route path="/company-management" element={<CompanyManagement/>}/>
+          <Route path="/coach-management" element={<CoachManagement/>}/>
         </Routes>
       </Router>
     </Provider>
