@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Home from "./pages/Home/Home";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap/dist/js/bootstrap.bundle.min";
+import Home from "./pages/Miscellaneous/Home/Home";
+import 'bootstrap/dist/css/bootstrap.min.css';
+import HRDashboard from "./pages/HR/Dashboard/Dashboard";
 
 const App = () => {
   useEffect(() => {
@@ -26,6 +26,7 @@ const App = () => {
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/hrdashboard" element={<HRDashboard/>}/>
       </Routes>
     </Router>
   );
