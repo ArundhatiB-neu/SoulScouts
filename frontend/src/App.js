@@ -7,6 +7,7 @@ import Settings from "./pages/Miscellaneous/Settings/Settings";
 import ResourceLibrary from "./pages/Miscellaneous/ResourceLibrary/ResourceLibrary";
 import CompanyManagement from "./pages/Admin/CompanyManagement/CompanyManagement";
 import CoachManagement from "./pages/Admin/CoachManagement/CoachManagement";
+import EmployeeManagement from "./pages/HR/Dashboard/EmployeeManagement/EmployeeManagement";
 import { Provider } from "react-redux";
 import store from "./redux/store";
 
@@ -38,6 +39,7 @@ const App = () => {
           <Route path="/library" element={<ResourceLibrary/>}/>
           <Route path="/company-management" element={<CompanyManagement/>}/>
           <Route path="/coach-management" element={<CoachManagement/>}/>
+          <Route path="/employee-management" element={<EmployeeManagement/>}/>
         </Routes>
       </Router>
     </Provider>
