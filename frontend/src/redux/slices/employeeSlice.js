@@ -16,7 +16,7 @@ const employeeSlice = createSlice({
           phone: "+1-555-0123"
         },
         coachId: "coach001",
-        coachName: "David Miller"
+        coachName: "David Miller",
       },
       {
         id: "emp002",
