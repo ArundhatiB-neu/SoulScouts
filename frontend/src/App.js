@@ -8,6 +8,7 @@ import ResourceLibrary from "./pages/Miscellaneous/ResourceLibrary/ResourceLibra
 import CompanyManagement from "./pages/Admin/CompanyManagement/CompanyManagement";
 import CoachManagement from "./pages/Admin/CoachManagement/CoachManagement";
 import EmployeeManagement from "./pages/HR/Dashboard/EmployeeManagement/EmployeeManagement";
+import Journal from "./pages/Employee/Journal/Journal";
 import { Provider } from "react-redux";
 import store from "./redux/store";
 
@@ -40,6 +41,7 @@ const App = () => {
           <Route path="/company-management" element={<CompanyManagement/>}/>
           <Route path="/coach-management" element={<CoachManagement/>}/>
           <Route path="/employee-management" element={<EmployeeManagement/>}/>
+          <Route path="/journal" element={<Journal/>}/>
         </Routes>
       </Router>
     </Provider>

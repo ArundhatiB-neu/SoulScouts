@@ -4,6 +4,7 @@ import resourcesReducer from './slices/resourcesSlice';
 import companyReducer from './slices/companySlice';
 import coachReducer from './slices/coachSlice';
 import employeeReducer from './slices/employeeSlice';
+import journalReducer from './slices/journalSlice';
 
 const store = configureStore({
   reducer: {
@@ -11,7 +12,8 @@ const store = configureStore({
     resources: resourcesReducer,
     companies: companyReducer,
     coaches: coachReducer,
-    employees: employeeReducer
+    employees: employeeReducer,
+    journal: journalReducer
   }
 });
 

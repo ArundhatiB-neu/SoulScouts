@@ -5,7 +5,7 @@ import logo from '../../Assets/soulscouts-logo.png';
 
 const Navigation = () => {
   //const userRole = useSelector(state => state.auth.role);
-  const userRole = "HR";
+  const userRole = "employee";
   
   const navLinks = {
     HR: [
@@ -20,6 +20,7 @@ const Navigation = () => {
       { title: 'Employee Dashboard', path: '/employee-dashboard' },
       { title: 'Employee Settings', path: '/settings' },
       { title: 'Resource Library', path: '/library' },
+      { title: 'Journal', path: '/journal' },
       { title: 'Logout', path: '/' }
     ],
     coach: [
