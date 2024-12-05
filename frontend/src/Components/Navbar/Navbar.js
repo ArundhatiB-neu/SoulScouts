@@ -10,7 +10,7 @@ const Navigation = () => {
   const navLinks = {
     HR: [
       { title: 'HR Dashboard', path: '/hr-dashboard' },
-      { title: 'HR Settings', path: '/hr-settings' },
+      { title: 'HR Settings', path: '/settings' },
       { title: 'Employee Management', path: '/employee-management' },
       { title: 'Resource Library', path: '/library' },
       { title: 'Manage Subscription', path: '/subscription' },
@@ -18,13 +18,13 @@ const Navigation = () => {
     ],
     employee: [
       { title: 'Employee Dashboard', path: '/employee-dashboard' },
-      { title: 'Employee Settings', path: '/employee-settings' },
+      { title: 'Employee Settings', path: '/settings' },
       { title: 'Resource Library', path: '/library' },
       { title: 'Logout', path: '/' }
     ],
     coach: [
       { title: 'Coach Dashboard', path: '/coach-dashboard' },
-      { title: 'Coach Settings', path: '/coach-settings' },
+      { title: 'Coach Settings', path: '/settings' },
       { title: 'Resource Library', path: '/library' },
       { title: 'Logout', path: '/' }
     ],
