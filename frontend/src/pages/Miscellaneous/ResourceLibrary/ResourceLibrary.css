@@ -1,0 +1,19 @@
+.resource-card {
+    transition: all 0.3s ease-in-out;
+    transform: translateY(0);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    height: 100%;
+  }
+  
+  .resource-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+  }
+  
+  .resource-card img {
+    cursor: pointer;
+  }
+  
+  .resource-card .card-title {
+    margin-top: 0.5rem;
+  }

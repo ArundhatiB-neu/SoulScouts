@@ -5,10 +5,10 @@ import logo from '../../Assets/soulscouts-logo.png';
 
 const Navigation = () => {
   //const userRole = useSelector(state => state.auth.role);
-  const userRole = "employee";
+  const userRole = "hr";
   
   const navLinks = {
-    HR: [
+    hr: [
       { title: 'HR Dashboard', path: '/hr-dashboard' },
       { title: 'HR Settings', path: '/settings' },
       { title: 'Employee Management', path: '/employee-management' },

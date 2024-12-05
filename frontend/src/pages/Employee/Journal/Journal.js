@@ -11,6 +11,7 @@ import {
 } from '../../../redux/slices/journalSlice';
 import { Modal, Button, Card, Container, Row, Col, Form, Alert, Spinner } from 'react-bootstrap';
 import { Navigate } from 'react-router-dom';
+import Navbar from '../../../Components/Navbar/Navbar';
 
 const Journal = () => {
   const dispatch = useDispatch();
@@ -146,6 +147,8 @@ const Journal = () => {
 
   return (
     <Container className="py-4">
+        <Navbar/>
+        <br/><br/>
       {error && (
         <Alert variant="danger" dismissible onClose={() => dispatch(setError(null))}>
           {error}

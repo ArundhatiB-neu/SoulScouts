@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Card, Button, Modal, Form, Container, Row, Col } from 'react-bootstrap';
 import { addResource, updateResource, deleteResource } from '../../../redux/store';
 import Navbar from '../../../Components/Navbar/Navbar';
+import './ResourceLibrary.css';
 
 const ResourceLibrary = () => {
   const [showModal, setShowModal] = useState(false);
@@ -12,7 +13,7 @@ const ResourceLibrary = () => {
   const categories = useSelector(state => state.resources.categories);
   //const userRole = useSelector(state => state.auth.role);
   const dispatch = useDispatch();
-  const userRole = "HR";
+  const userRole = "hr";
   
   const isAdmin = userRole === 'admin';
 
@@ -69,9 +70,9 @@ const ResourceLibrary = () => {
           </Button>
         )}
         <Form.Select 
+          className="category-select"
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
-          style={{ width: 'auto' }}
         >
           <option value="">All Categories</option>
           {categories.map(cat => (
@@ -85,18 +86,17 @@ const ResourceLibrary = () => {
       <Row xs={1} md={2} lg={3} className="g-4">
         {filteredResources.map(resource => (
           <Col key={resource.id}>
-            <Card>
-              <Card.Img 
-                variant="top" 
-                src={`https://img.youtube.com/vi/${getYouTubeId(resource.link)}/mqdefault.jpg`}
-                alt={resource.title}
-              />
+            <Card className="resource-card">
+              <a href={resource.link} target="_blank" rel="noopener noreferrer">
+                <Card.Img 
+                  variant="top" 
+                  src={`https://img.youtube.com/vi/${getYouTubeId(resource.link)}/mqdefault.jpg`}
+                  alt={resource.title}
+                />
+              </a>
               <Card.Body>
                 <Card.Title>{resource.title}</Card.Title>
                 <Card.Text>{resource.description}</Card.Text>
-                <a href={resource.link} target="_blank" rel="noopener noreferrer">
-                  <Button variant="link">Watch Video</Button>
-                </a>
                 {isAdmin && (
                   <div className="mt-2">
                     <Button 
