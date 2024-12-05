@@ -1,18 +1,31 @@
 const express = require("express");
+const bodyParser = require("body-parser");
 const cors = require("cors");
-require("dotenv").config();
+const multer = require("multer");
+const path = require("path");
+const userRoutes = require("./routes/userRoutes");
+const companyRoutes = require("./routes/companyRoutes");
+const fs = require("fs");
 
+// Create profilePictures folder if it doesn't exist
+const profilePicturesDir = path.join(__dirname, "../profilePictures");
+
+if (!fs.existsSync(profilePicturesDir)) {
+  fs.mkdirSync(profilePicturesDir, { recursive: true });
+}
 const app = express();
+
+app.use(bodyParser.json());
 app.use(cors());
-app.use(express.json());
 
-app.get("/api", (req, res) => {
-  res.json({ message: "same repo frontend backend setup trial" });
-});
+// Set up static folder to serve uploaded images
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-const PORT = process.env.PORT || 5001;
-app.listen(PORT, () => {
-  console.log(`Backend server is running on http://localhost:${PORT}`);
-});
+// Log routes
+console.log("User routes loaded");
+app.use("/user", userRoutes);
+
+console.log("Company routes loaded");
+app.use("/company", companyRoutes);
 
 module.exports = app;
