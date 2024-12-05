@@ -11,6 +11,8 @@ import EmployeeManagement from "./pages/HR/Dashboard/EmployeeManagement/Employee
 import Journal from "./pages/Employee/Journal/Journal";
 import { Provider } from "react-redux";
 import store from "./redux/store";
+import Signup from "./pages/Authentication/Signup/Signup";
+import Login from "./pages/Authentication/Login/Login";
 
 const App = () => {
   useEffect(() => {
@@ -42,6 +44,8 @@ const App = () => {
           <Route path="/coach-management" element={<CoachManagement/>}/>
           <Route path="/employee-management" element={<EmployeeManagement/>}/>
           <Route path="/journal" element={<Journal/>}/>
+          <Route path="/signup" element={<Signup/>}/>
+          <Route path="/login" element={<Login/>}/>
         </Routes>
       </Router>
     </Provider>

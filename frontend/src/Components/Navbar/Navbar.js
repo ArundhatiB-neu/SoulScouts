@@ -14,26 +14,26 @@ const Navigation = () => {
       { title: 'Employee Management', path: '/employee-management' },
       { title: 'Resource Library', path: '/library' },
       { title: 'Manage Subscription', path: '/subscription' },
-      { title: 'Logout', path: '/' }
+      { title: 'Logout', path: '/login' }
     ],
     employee: [
       { title: 'Employee Dashboard', path: '/employee-dashboard' },
       { title: 'Employee Settings', path: '/settings' },
       { title: 'Resource Library', path: '/library' },
       { title: 'Journal', path: '/journal' },
-      { title: 'Logout', path: '/' }
+      { title: 'Logout', path: '/login' }
     ],
     coach: [
       { title: 'Coach Dashboard', path: '/coach-dashboard' },
       { title: 'Coach Settings', path: '/settings' },
       { title: 'Resource Library', path: '/library' },
-      { title: 'Logout', path: '/' }
+      { title: 'Logout', path: '/login' }
     ],
     admin: [
       { title: 'Coach Management', path: '/coach-management' },
       { title: 'Company Management', path: '/company-management' },
       { title: 'Resource Library', path: '/library' },
-      { title: 'Logout', path: '/' }
+      { title: 'Logout', path: '/login' }
     ]
   };
 
