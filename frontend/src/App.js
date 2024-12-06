@@ -16,6 +16,7 @@ import store from "./redux/store";
 import Signup from "./pages/Authentication/Signup/Signup";
 import Login from "./pages/Authentication/Login/Login";
 import EmployeeDashboard from "./pages/Employee/Dashboard/EmployeeDashboard";
+import CoachDashboard from "./pages/Coach/Coach-Dashboard/CoachDashboard";
 
 const App = () => {
   useEffect(() => {
@@ -42,6 +43,7 @@ const App = () => {
           <Route path="/" element={<Home />} />
           <Route path="/hr-dashboard" element={<HRDashboard/>}/>
           <Route path="/employee-dashboard" element={<EmployeeDashboard/>}/>
+          <Route path="/coach-dashboard" element={<CoachDashboard/>}/>
           <Route path="/settings" element={<Settings/>}/>
           <Route path="/library" element={<ResourceLibrary/>}/>
           <Route path="/company-management" element={<CompanyManagement/>}/>
@@ -50,6 +52,7 @@ const App = () => {
           <Route path="/journal" element={<Journal/>}/>
           <Route path="/signup" element={<Signup/>}/>
           <Route path="/login" element={<Login/>}/>
+          
         </Routes>
       </Router>
     </Provider>
