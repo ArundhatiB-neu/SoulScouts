@@ -74,10 +74,10 @@ const CompanyManagement = () => {
   };
 
   return (
-    <Container className="py-4">
+    <div>
       <Navbar />
-      <br /><br />
-      <div className="p-4">
+      <Container>
+      <div className="p-5">
         <div className="d-flex justify-content-between align-items-center mb-4">
           <h2>Company Management</h2>
           <Button 
@@ -85,6 +85,7 @@ const CompanyManagement = () => {
               setSelectedCompany(null);
               setShowModal(true);
             }}
+            className="w-auto"
           >
             Add Company
           </Button>
@@ -212,6 +213,7 @@ const CompanyManagement = () => {
         </Modal>
       </div>
     </Container>
+    </div>
   );
 };
 
