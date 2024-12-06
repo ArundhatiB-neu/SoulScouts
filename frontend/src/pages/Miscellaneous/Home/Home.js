@@ -1,7 +1,10 @@
 import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "./Home.css";
 
 const Home = () => {
+  const navigate = useNavigate();
+
   useEffect(() => {
     // Spinner logic
     const spinner = document.getElementById("spinner");
@@ -21,6 +24,11 @@ const Home = () => {
     } catch (error) {
       alert("Error fetching the API: " + error.message);
     }
+  };
+
+  // Function to handle the "Login/Sign Up" button click
+  const handleLoginClick = () => {
+    navigate("/login");
   };
 
   return (
@@ -83,8 +91,7 @@ const Home = () => {
                 <button
                   type="button"
                   className="btn btn-primary me-2"
-                  data-bs-toggle="modal"
-                  data-bs-target="#exampleModal"
+                  onClick={handleLoginClick}
                 >
                   Login/Sign Up
                 </button>
