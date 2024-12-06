@@ -1,5 +1,6 @@
 const Coach = require("../models/Coach");
 const bcrypt = require("bcrypt");
+const Company = require("../models/Company");
 
 exports.registerCoach = async (req, res) => {
   const { fullName, email, phone, specialization, password, confirmPassword } =
@@ -82,5 +83,66 @@ exports.registerCoach = async (req, res) => {
     res
       .status(500)
       .json({ error: "An error occurred during coach registration." });
+  }
+};
+
+exports.assignCompany = async (req, res) => {
+  const { coachId, companyId } = req.body;
+
+  try {
+    // Validate coach and company IDs
+    if (!coachId || !companyId) {
+      return res
+        .status(400)
+        .json({ error: "Coach ID and Company ID are required." });
+    }
+
+    // Verify if the coach exists
+    const coach = await Coach.findById(coachId);
+    if (!coach) {
+      return res.status(404).json({ error: "Coach not found." });
+    }
+
+    // Verify if the company exists
+    const company = await Company.findById(companyId);
+    if (!company) {
+      return res.status(404).json({ error: "Company not found." });
+    }
+
+    // Assign company to coach
+    coach.company = companyId;
+    await coach.save();
+
+    res.status(200).json({
+      message: "Company assigned to coach successfully.",
+      coach,
+    });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while assigning the company." });
+  }
+};
+
+exports.getAllCoaches = async (req, res) => {
+  try {
+    const coaches = await Coach.find()
+      .select("-password") // Exclude the password field
+      .populate("company", "name domain");
+
+    if (!coaches || coaches.length === 0) {
+      return res.status(404).json({ error: "No coaches found." });
+    }
+
+    res.status(200).json({
+      message: "Coaches retrieved successfully.",
+      coaches,
+    });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while fetching coaches." });
   }
 };
