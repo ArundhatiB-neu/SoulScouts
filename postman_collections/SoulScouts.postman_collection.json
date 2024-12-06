@@ -120,6 +120,25 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "logout",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5001/logout",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"logout"
+					]
+				}
+			},
+			"response": []
 		}
 	]
 }

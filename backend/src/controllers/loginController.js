@@ -1,7 +1,10 @@
 const Employee = require("../models/Employee");
 const HR = require("../models/HR");
 const Coach = require("../models/Coach");
+const Session = require("../models/Session"); // Import the Session model
+const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const { jwtSecret, jwtExpiry } = require("../config/jwtConfig");
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
@@ -32,14 +35,48 @@ exports.loginUser = async (req, res) => {
       return res.status(401).json({ error: "Invalid email or password." });
     }
 
+    // Check for existing active session
+    const existingSession = await Session.findOne({ userId: user._id });
+    if (existingSession) {
+      return res
+        .status(400)
+        .json({ error: "User already logged in. Please log out first." });
+    }
+
+    // Generate JWT token
+    const token = jwt.sign(
+      {
+        id: user._id,
+        type: user.constructor.modelName, // Identify if HR, Employee, or Coach
+      },
+      jwtSecret,
+      { expiresIn: jwtExpiry }
+    );
+
+    // Calculate token expiration time
+    const expiresAt = new Date();
+    expiresAt.setMinutes(expiresAt.getMinutes() + 15);
+
+    // Save token to the Session collection
+    const newSession = new Session({
+      type: user.constructor.modelName,
+      userId: user._id,
+      token,
+      createdAt: new Date(),
+      expiresAt,
+    });
+
+    await newSession.save();
+
     res.status(200).json({
       message: "Login successful.",
       user: {
         id: user._id,
         fullName: user.fullName,
         email: user.email,
-        type: user.constructor.modelName, // Identify if HR, Employee, or Coach
+        type: user.constructor.modelName,
       },
+      token,
     });
   } catch (error) {
     console.error(error);
