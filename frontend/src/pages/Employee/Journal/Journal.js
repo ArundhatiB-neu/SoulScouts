@@ -146,9 +146,9 @@ const Journal = () => {
   }
 
   return (
-    <Container className="py-4">
-        <Navbar/>
-        <br/><br/>
+    <div>
+      <Navbar />
+      <Container className='p-4'>
       {error && (
         <Alert variant="danger" dismissible onClose={() => dispatch(setError(null))}>
           {error}
@@ -157,7 +157,7 @@ const Journal = () => {
 
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2>My Journal</h2>
-        <Button variant="primary" onClick={() => setShowCreateModal(true)}>
+        <Button variant="primary" className='w-auto' onClick={() => setShowCreateModal(true)}>
           New Entry
         </Button>
       </div>
@@ -303,6 +303,7 @@ const Journal = () => {
         </Modal.Footer>
       </Modal>
     </Container>
+    </div>
   );
 };
 
