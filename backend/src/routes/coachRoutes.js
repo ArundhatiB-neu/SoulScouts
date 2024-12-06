@@ -2,6 +2,9 @@ const express = require("express");
 const { registerCoach } = require("../controllers/coachController");
 const router = express.Router();
 
-router.post("/", registerCoach);
+// Register a new coach
+router.post("/register", registerCoach);
+// router.post("/assign-company", registerCoach);
+
 
 module.exports = router;
