@@ -42,7 +42,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"fullName\": \"Jane Doe one\",\n  \"company\": \"Tech Corp\",\n  \"email\": \"jane.doe.one@company.com\",\n  \"domain\": \"@company.com\",\n  \"phone\": \"+11234567890\",\n  \"password\": \"StrongP@ssw0rd\",\n  \"confirmPassword\": \"StrongP@ssw0rd\"\n}",
+					"raw": "{\n  \"fullName\": \"Jane Doe todelete\",\n  \"company\": \"Tech Corp\",\n  \"email\": \"jane.doe.todelete@company.com\",\n  \"domain\": \"@company.com\",\n  \"phone\": \"+11234567890\",\n  \"password\": \"StrongP@ssw0rd\",\n  \"confirmPassword\": \"StrongP@ssw0rd\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -50,15 +50,15 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:5001/register/employee",
+					"raw": "http://localhost:5001/employee/register",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "5001",
 					"path": [
-						"register",
-						"employee"
+						"employee",
+						"register"
 					]
 				}
 			},
@@ -100,7 +100,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"email\": \"john.doe@company.com\",\n  \"password\": \"SecureP@ssw0rd\"\n}",
+					"raw": "{\n  \"email\": \"jane.doe.two@company.com\",\n  \"password\": \"Strong@Password1234\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -145,6 +145,119 @@
 					"port": "5001",
 					"path": [
 						"logout"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "updateEmployee",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3NTMzM2JiNjg5YzljNjEyNjBlNTQ0MiIsInR5cGUiOiJFbXBsb3llZSIsImlhdCI6MTczMzUwNjQ0NiwiZXhwIjoxNzMzNTA3MzQ2fQ.n4mQtFXW_Jr15aAi-xLQNwplOGEjcc8EcU0pR_UJmBw",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"phone\": \"1234567890\",\n  \"newPassword\": \"Strong@Password1234\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5001/employee/update/675333bb689c9c61260e5442",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"employee",
+						"update",
+						"675333bb689c9c61260e5442"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get all employees",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3NTMzM2JiNjg5YzljNjEyNjBlNTQ0MiIsInR5cGUiOiJFbXBsb3llZSIsImlhdCI6MTczMzUwNzA0NywiZXhwIjoxNzMzNTA3OTQ3fQ.54Q6XYBDtlIuebHlk1AdQgALqiIiE__5uXV3OE1a66k",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5001/employee/getAll?company=Tech%20Corp",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"employee",
+						"getAll"
+					],
+					"query": [
+						{
+							"key": "company",
+							"value": "Tech%20Corp"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete employee",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3NTMzM2JiNjg5YzljNjEyNjBlNTQ0MiIsInR5cGUiOiJFbXBsb3llZSIsImlhdCI6MTczMzUwNzA0NywiZXhwIjoxNzMzNTA3OTQ3fQ.54Q6XYBDtlIuebHlk1AdQgALqiIiE__5uXV3OE1a66k",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5001/employee/delete/675338c5cdb640b2c9af1d67",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"employee",
+						"delete",
+						"675338c5cdb640b2c9af1d67"
 					]
 				}
 			},

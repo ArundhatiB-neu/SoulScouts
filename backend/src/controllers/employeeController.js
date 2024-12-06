@@ -99,3 +99,136 @@ exports.registerEmployee = async (req, res) => {
       .json({ error: "An error occurred during employee registration." });
   }
 };
+
+exports.updateEmployee = async (req, res) => {
+  const { id } = req.params; // Employee ID from request parameters
+  const { phone, newPassword } = req.body;
+
+  try {
+    // Validate if at least one field is provided
+    if (!phone && !newPassword) {
+      return res.status(400).json({ error: "Please provide data to update." });
+    }
+
+    // Validate US phone number if provided
+    if (phone) {
+      const phoneRegex = /^(\+1|1)?\d{10}$/;
+      if (!phoneRegex.test(phone)) {
+        return res.status(400).json({
+          error: "Invalid phone number. It must be a valid US phone number.",
+        });
+      }
+    }
+
+    // Validate password if provided
+    if (newPassword) {
+      const passwordRegex =
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+      if (!passwordRegex.test(newPassword)) {
+        return res.status(400).json({
+          error:
+            "Password must be at least 8 characters long and include one uppercase letter, one lowercase letter, one number, and one special character.",
+        });
+      }
+
+      // Fetch the existing employee to compare the password
+      const employee = await Employee.findById(id);
+      if (!employee) {
+        return res.status(404).json({ error: "Employee not found." });
+      }
+
+      const isSamePassword = await bcrypt.compare(
+        newPassword,
+        employee.password
+      );
+      if (isSamePassword) {
+        return res.status(400).json({
+          error: "The new password cannot be the same as the old password.",
+        });
+      }
+    }
+
+    // Update employee details
+    const updates = {};
+    if (phone) updates.phone = phone;
+    if (newPassword) {
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      updates.password = hashedPassword;
+    }
+
+    const updatedEmployee = await Employee.findByIdAndUpdate(
+      id,
+      { $set: updates },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedEmployee) {
+      return res.status(404).json({ error: "Employee not found." });
+    }
+
+    res.status(200).json({
+      message: "Employee updated successfully.",
+      employee: updatedEmployee,
+    });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while updating the employee." });
+  }
+};
+
+// Get all employees by company name
+exports.getAllEmployees = async (req, res) => {
+  const { company } = req.query; // getting name form query param
+
+  try {
+    if (!company) {
+      return res.status(400).json({ error: "Company name is required." });
+    }
+
+    const employees = await Employee.find({ company }).select("-password");
+    if (!employees || employees.length === 0) {
+      return res
+        .status(404)
+        .json({ error: "No employees found for this company." });
+    }
+
+    res.status(200).json({
+      message: "Employees retrieved successfully.",
+      employees,
+    });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while fetching employees." });
+  }
+};
+
+// Delete an employee by ID
+exports.deleteEmployees = async (req, res) => {
+  const { id } = req.params; // Get the employee ID from route parameters
+
+  try {
+    const deletedEmployee = await Employee.findByIdAndDelete(id, {
+      projection: { password: 0 },
+    });
+
+    if (!deletedEmployee) {
+      return res.status(404).json({ error: "Employee not found." });
+    }
+    const { password, ...employeeWithoutPassword } = deletedEmployee._doc;
+
+    res.status(200).json({
+      message: "Employee deleted successfully.",
+      employee: employeeWithoutPassword,
+    });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while deleting the employee." });
+  }
+};
+

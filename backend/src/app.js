@@ -17,14 +17,16 @@ app.use(cors());
 
 // Public Routes
 app.use("/register/hr", hrRoutes);
-app.use("/register/employee", employeeRoutes);
 app.use("/register/coach", coachRoutes);
 app.use("/login", loginRoutes);
+
+// Consolidated Employee Routes
+app.use("/employee", employeeRoutes);
 
 // Authenticated Routes Middleware
 app.use(authenticateToken);
 
 // Authenticated Routes
-app.use("/logout", logoutRoutes); 
+app.use("/logout", logoutRoutes);
 
 module.exports = app;
