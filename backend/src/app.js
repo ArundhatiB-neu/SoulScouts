@@ -1,31 +1,22 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const multer = require("multer");
-const path = require("path");
-const userRoutes = require("./routes/userRoutes");
-const companyRoutes = require("./routes/companyRoutes");
-const fs = require("fs");
 
-// Create profilePictures folder if it doesn't exist
-const profilePicturesDir = path.join(__dirname, "../profilePictures");
+const hrRoutes = require("./routes/hrRoutes");
+const employeeRoutes = require("./routes/employeeRoutes");
+const coachRoutes = require("./routes/coachRoutes");
+const loginRoutes = require("./routes/loginRoutes"); // Import login routes
 
-if (!fs.existsSync(profilePicturesDir)) {
-  fs.mkdirSync(profilePicturesDir, { recursive: true });
-}
 const app = express();
 
+// Middleware
 app.use(bodyParser.json());
 app.use(cors());
 
-// Set up static folder to serve uploaded images
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-
-// Log routes
-console.log("User routes loaded");
-app.use("/user", userRoutes);
-
-console.log("Company routes loaded");
-app.use("/company", companyRoutes);
+// HR, Employee, Coach, and Login Routes
+app.use("/register/hr", hrRoutes);
+app.use("/register/employee", employeeRoutes);
+app.use("/register/coach", coachRoutes);
+app.use("/login", loginRoutes); // Add login route
 
 module.exports = app;
