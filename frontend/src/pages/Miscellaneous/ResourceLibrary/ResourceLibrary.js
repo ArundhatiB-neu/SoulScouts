@@ -52,12 +52,14 @@ const ResourceLibrary = () => {
     : resources;
 
   return (
-    <Container className="py-4">
+    <div>
       <Navbar/>
+      <Container>
+      
       <br/><br/>
-      <h1>Resource Library</h1>
-      <br/>
-      <div className="d-flex justify-content-between align-items-center mb-4">
+      <h1 class="text-center">Resource Library</h1>
+      <div class="p-5">
+      <div className="d-flex justify-content-between align-items-center mb-5">
         {isAdmin && (
           <Button 
             variant="primary"
@@ -185,7 +187,10 @@ const ResourceLibrary = () => {
           </Modal.Body>
         </Modal>
       )}
+      </div>
+      
     </Container>
+    </div>
   );
 };
 

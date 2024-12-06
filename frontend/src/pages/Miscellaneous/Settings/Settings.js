@@ -66,8 +66,10 @@ const Settings = () => {
   };
 
   return (
-    <Container fluid>
+    <div>
       <Navbar/>
+      <Container>
+      
       <div class="p-5">
       <br/><br/>
       <h2>Settings</h2>
@@ -203,12 +205,13 @@ const Settings = () => {
           />
         </Form.Group>
 
-        <Button variant="primary" type="submit">
+        <Button variant="primary" type="submit" className='w-auto'>
           Save Changes
         </Button>
       </Form>
       </div>
     </Container>
+    </div>
   );
 };
 

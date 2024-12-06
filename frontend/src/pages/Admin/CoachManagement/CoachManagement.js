@@ -94,8 +94,9 @@ const CoachManagement = () => {
   : coaches.filter(coach => coach.companyId && coach.companyId.toString() === selectedCompanyFilter.toString());
 
   return (
-    <Container className="py-4">
+    <div>
       <Navbar />
+      <Container>
       <br /><br />
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2>Coach Management</h2>
@@ -244,6 +245,8 @@ const CoachManagement = () => {
         </Modal.Body>
       </Modal>
     </Container>
+    </div>
+    
   );
 };
 

@@ -101,10 +101,12 @@ const EmployeeManagement = () => {
   });
 
   return (
-    <Container className="py-4">
+    <div>
       <Navbar />
+      <Container>
       <br /><br />
-      <h2>Employee Management</h2>
+      <h2 class="text-center">Employee Management</h2>
+      <div class="p-5">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <div className="d-flex gap-3">
           <Form.Select 
@@ -129,7 +131,7 @@ const EmployeeManagement = () => {
             ))}
           </Form.Select>
         </div>
-        <Button onClick={() => setShowModal(true)}>Add Employee</Button>
+        <Button onClick={() => setShowModal(true)} className="w-auto">Add Employee</Button>
       </div>
 
       <Row className="g-4">
@@ -266,7 +268,9 @@ const EmployeeManagement = () => {
           </Form>
         </Modal.Body>
       </Modal>
+      </div>
     </Container>
+    </div>
   );
 };
 

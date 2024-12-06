@@ -268,10 +268,11 @@ const HRDashboard = () => {
   return (
     <div>
       <Navbar />
-      <Container fluid className="p-4">
-        <Row className="mb-4">
+      <Container>
+       <div class="p-5">
+       <Row className="mb-4">
           <Col>
-            <h1 className="text-2xl font-bold">Department Wellness Overview</h1>
+            <h1 className="text-2xl font-bold text-center">Department Wellness Overview</h1>
           </Col>
         </Row>
 
@@ -321,6 +322,7 @@ const HRDashboard = () => {
             </Col>
           ))}
         </Row>
+       </div>
       </Container>
     </div>
   );
