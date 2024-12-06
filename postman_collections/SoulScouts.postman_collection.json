@@ -42,7 +42,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"fullName\": \"Jane Doe\",\n  \"company\": \"Tech Corp\",\n  \"email\": \"jane.doe@company.com\",\n  \"domain\": \"@company.com\",\n  \"phone\": \"+11234567890\",\n  \"password\": \"StrongP@ssw0rd\",\n  \"confirmPassword\": \"StrongP@ssw0rd\"\n}",
+					"raw": "{\n  \"fullName\": \"Jane Doe one\",\n  \"company\": \"Tech Corp\",\n  \"email\": \"jane.doe.one@company.com\",\n  \"domain\": \"@company.com\",\n  \"phone\": \"+11234567890\",\n  \"password\": \"StrongP@ssw0rd\",\n  \"confirmPassword\": \"StrongP@ssw0rd\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -71,7 +71,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"fullName\": \"Coach Doe\",\n  \"email\": \"coach.doe@soulscouts.com\",\n  \"phone\": \"+1234567890\",\n  \"specialization\": \"Leadership Development\",\n  \"password\": \"StrongP@ssw0rd\",\n  \"confirmPassword\": \"StrongP@ssw0rd\"\n}",
+					"raw": "{\n  \"fullName\": \"Coach Doe\",\n  \"email\": \"coach.doe@soulscouts.com\",\n  \"phone\": \"+12345678900\",\n  \"specialization\": \"Leadership Development\",\n  \"password\": \"StrongP@ssw0rd\",\n  \"confirmPassword\": \"StrongP@ssw0rd\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -100,7 +100,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"YourPassword123!\"\n}",
+					"raw": "{\n  \"email\": \"john.doe@company.com\",\n  \"password\": \"SecureP@ssw0rd\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -124,6 +124,16 @@
 		{
 			"name": "logout",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3NTJiMzk1ZDg4MTEwN2FjNDc3NDI4OSIsInR5cGUiOiJIUiIsImlhdCI6MTczMzUwMTc0MiwiZXhwIjoxNzMzNTAyNjQyfQ.ZN0BiwzQMihmXCTB0nD2MBgSgDi-UOwJBJRUS8Uf0jg",
+							"type": "string"
+						}
+					]
+				},
 				"method": "POST",
 				"header": [],
 				"url": {
