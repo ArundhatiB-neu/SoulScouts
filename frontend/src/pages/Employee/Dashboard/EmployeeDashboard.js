@@ -1,4 +1,4 @@
-import React , { useState } from 'react';
+import React , { useState , useEffect } from 'react';
 import Navbar from '../../../Components/Navbar/Navbar';
 import {Container , Row, Col} from 'react-bootstrap';
 import EmployeeWellnessForm from '../../../Components/Employee-Wellness-Form/EmployeeWellnessForm';
@@ -104,13 +104,37 @@ const EmployeeDashboard = () => {
   ];
 
   // State to manage wellness data
-  const [wellnessData, setWellnessData] = useState(initialWellnessData);
+  const [wellnessData, setWellnessData] = useState([]);
   const [submitMessage, setSubmitMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
+  // Fetch the logged In users data
+  useEffect(() => {
+    const fetchWellnessData = async () => {
+      try {
+        setIsLoading(true);
+        // const response = await fetch(`/api/wellness/employee/${currentUser.id}`);
+        // if (!response.ok) {
+        //   throw new Error('Failed to fetch wellness data');
+        // }
+        // const data = await response.json();
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        setWellnessData(initialWellnessData);
+        setError(null);
+      } catch (err) {
+        setError(err.message);
+        console.error('Error fetching wellness data:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchWellnessData();
+  }, [currentUser.id]);
 
   // Handle form submission
   const handleWellnessSubmit = async (newData) => {
-  
     try {
       const dateExists = wellnessData.some(entry => entry.date === newData.date);
   
@@ -118,17 +142,35 @@ const EmployeeDashboard = () => {
         setSubmitMessage('An entry already exists for this date. Please select a different date.');
         return false;
       }
+
+      // Add employee ID and department to the data
+      const wellnessEntry = {
+        ...newData,
+        employeeId: currentUser.id,
+        department: currentUser.department
+      };
   
-      // Add new data to state
+      // Send to API
+      const response = await fetch('/api/wellness/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(wellnessEntry),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to submit wellness data');
+      }
+
+      // Update local state
       setWellnessData(prevData => {
-        const updatedData = [...prevData, newData].sort((a, b) =>
+        const updatedData = [...prevData, wellnessEntry].sort((a, b) =>
           new Date(a.date) - new Date(b.date)
         );
-        console.log("Updated wellness data:", updatedData);
         return updatedData;
       });
   
-      // Reset the form after a successful submission
       setSubmitMessage('Wellness data saved successfully!');
       return true;
     } catch (error) {
@@ -138,13 +180,21 @@ const EmployeeDashboard = () => {
     }
   };
 
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
-  console.log('Wellness data dates:', wellnessData.map(d => d.date));
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
   
   return (
-    <Container fluid className="p-4">
+    <div>
       <Navbar />
-      <Row className="mb-4 py-5">
+      <Container fluid>
+      
+      <div class="p-5">
+      <Row className="mb-4 py-2">
         <Col>
           <h1 className="text-2xl font-bold text-center">Employee Wellness Dashboard</h1>
         </Col>
@@ -178,7 +228,10 @@ const EmployeeDashboard = () => {
           </Row>
         </Col>
       </Row>
+      </div>
     </Container>
+    </div>
+    
   );
 };
 

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Card, Button, Modal, Form, Container, Row, Col, Dropdown } from 'react-bootstrap';
-import { addEmployee, updateEmployee, deleteEmployee, assignCoach } from '../../../../redux/slices/employeeSlice';
-import Navbar from '../../../../Components/Navbar/Navbar';
+import { addEmployee, updateEmployee, deleteEmployee, assignCoach } from '../../../redux/slices/employeeSlice';
+import Navbar from '../../../Components/Navbar/Navbar';
 import { Navigate } from 'react-router-dom';
 
 const EmployeeManagement = () => {

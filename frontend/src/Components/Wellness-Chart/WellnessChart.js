@@ -1,6 +1,6 @@
-import React , { useState , useMemo  } from 'react';
+import React, { useState, useMemo } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { Card, CardBody, CardTitle , Form , Row, Col } from 'react-bootstrap';
+import { Card, CardBody, CardTitle, Form, Row, Col } from 'react-bootstrap';
 
 const WellnessChart = ({ 
   data, 
@@ -13,12 +13,15 @@ const WellnessChart = ({
   physicalColor = "#8884d8",
   mentalColor = "#82ca9d",
   workLifeColor = "#ffc658",
-  totalColor = "#ff7300"
+  totalColor = "#ff7300",
+  selectedDepartment = 'all',
+  onDepartmentChange
 }) => {
-  const [viewMode, setViewMode] = useState('daily');
+   const [viewMode, setViewMode] = useState('daily');
   const [selectedMetric, setSelectedMetric] = useState('all');
+  const userRole = "employee";
 
-   // Function to get last 7 days of data
+  // Function to get last 7 days of data
   const getLastSevenDays = (data) => {
     const sortedData = [...data].sort((a, b) => {
       return new Date(b.date) - new Date(a.date);
@@ -30,17 +33,14 @@ const WellnessChart = ({
       .sort((a, b) => new Date(a.date) - new Date(b.date))
       .map(entry => ({
         ...entry,
-        // Keep the original date string but format it for display
-        date: entry.date.split('-')[1] + '/' + entry.date.split('-')[2] // This will show as MM/DD
+        date: entry.date.split('-')[1] + '/' + entry.date.split('-')[2]
       }));
   };
 
-
-   // Function to aggregate data by week
-   const aggregateByWeek = (data) => {
+  // Function to aggregate data by week
+  const aggregateByWeek = (data) => {
     const weeklyData = data.reduce((acc, entry) => {
       const date = new Date(entry.date);
-      // Get the week start date (Sunday)
       const weekStart = new Date(date);
       weekStart.setDate(date.getDate() - date.getDay());
       const weekKey = weekStart.toISOString().split('T')[0];
@@ -65,7 +65,6 @@ const WellnessChart = ({
       return acc;
     }, {});
 
-    // Calculate averages and format dates
     return Object.values(weeklyData).map(week => ({
       date: formatWeekLabel(week.date),
       physical: +(week.physical / week.count).toFixed(2),
@@ -83,18 +82,15 @@ const WellnessChart = ({
     return `${start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${end.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
   };
 
-  // Format daily dates
-  // const formatDailyData = (data) => {
-  //   return data.map(entry => ({
-  //     ...entry,
-  //     date: new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-  //   }));
-  // };
-
-  // Memoize the chart data based on view mode
+  // Memoize the chart data based on view mode and department
   const chartData = useMemo(() => {
-    return viewMode === 'daily' ? getLastSevenDays(data) : aggregateByWeek(data);
-  }, [data, viewMode]);
+    let filteredData = data;
+    if (selectedDepartment !== 'all') {
+      filteredData = data.filter(entry => entry.department === selectedDepartment);
+    }
+
+    return viewMode === 'daily' ? getLastSevenDays(filteredData) : aggregateByWeek(filteredData);
+  }, [data, viewMode, selectedDepartment]);
 
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
@@ -128,6 +124,21 @@ const WellnessChart = ({
             <Col>
               <CardTitle tag="h2">{title}</CardTitle>
             </Col>
+            {userRole === 'hr' && (
+              <Col xs="auto">
+                <Form.Select
+                  value={selectedDepartment}
+                  onChange={(e) => onDepartmentChange(e.target.value)}
+                  className="me-2"
+                  style={{ width: 'auto' }}
+                >
+                  <option value="all">All Departments</option>
+                  <option value="Engineering">Engineering</option>
+                  <option value="Marketing">Marketing</option>
+                  <option value="Sales">Sales</option>
+                </Form.Select>
+              </Col>
+            )}
             <Col xs="auto">
               <Form.Select 
                 value={selectedMetric}
@@ -217,76 +228,6 @@ const WellnessChart = ({
       </CardBody>
     </Card>
   );
-  // return (
-  //   <Card>
-  //     <CardBody>
-  //       <div className="d-flex justify-content-between align-items-center mb-4">
-  //         <CardTitle tag="h2">{title}</CardTitle>
-  //         <Form.Select 
-  //           value={viewMode}
-  //           onChange={(e) => setViewMode(e.target.value)}
-  //           style={{ width: 'auto' }}
-  //         >
-  //           <option value="daily">Last 7 Days</option>
-  //           <option value="weekly">Weekly View</option>
-  //         </Form.Select>
-  //       </div>
-  //       <div style={{ width: '100%', height: `${height}px` }}>
-  //         <ResponsiveContainer width="100%" height={height}>
-  //           <LineChart data={chartData}>
-  //             <XAxis 
-  //               dataKey="date"
-  //               interval="preserveStartEnd"
-  //               angle={-15}
-  //               textAnchor="end"
-  //               height={60}
-  //             />
-  //             <YAxis />
-  //             <CartesianGrid strokeDasharray="3 3" />
-  //             <Tooltip />
-  //             <Legend />
-  //             {showPhysical && (
-  //               <Line 
-  //                 type="monotone" 
-  //                 dataKey="physical" 
-  //                 stroke={physicalColor} 
-  //                 strokeWidth={2}
-  //                 name="Physical Wellness"
-  //               />
-  //             )}
-  //             {showMental && (
-  //               <Line 
-  //                 type="monotone" 
-  //                 dataKey="mental" 
-  //                 stroke={mentalColor} 
-  //                 strokeWidth={2}
-  //                 name="Mental Wellness"
-  //               />
-  //             )}
-  //             {showWorkLife && (
-  //               <Line 
-  //                 type="monotone" 
-  //                 dataKey="workLife" 
-  //                 stroke={workLifeColor} 
-  //                 strokeWidth={2}
-  //                 name="Work-Life Balance"
-  //               />
-  //             )}
-  //             {showTotal && (
-  //               <Line 
-  //                 type="monotone" 
-  //                 dataKey="total" 
-  //                 stroke={totalColor} 
-  //                 strokeWidth={2}
-  //                 name="Total Wellness"
-  //               />
-  //             )}
-  //           </LineChart>
-  //         </ResponsiveContainer>
-  //       </div>
-  //     </CardBody>
-  //   </Card>
-  // );
 };
 
 export default WellnessChart;
