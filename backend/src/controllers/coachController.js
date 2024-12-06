@@ -127,17 +127,21 @@ exports.assignCompany = async (req, res) => {
 
 exports.getAllCoaches = async (req, res) => {
   try {
-    const coaches = await Coach.find()
-      .select("-password") // Exclude the password field
-      .populate("company", "name domain");
+    const { company } = req.query; // Optional company ID filter from query params
+    const query = company ? { company } : {}; // filter by company if provided
+    const coaches = await Coach.find(query).populate("company", "name domain");
 
     if (!coaches || coaches.length === 0) {
       return res.status(404).json({ error: "No coaches found." });
     }
+    const sanitizedCoaches = coaches.map((coach) => {
+      const { password, ...rest } = coach.toObject();
+      return rest;
+    });
 
     res.status(200).json({
       message: "Coaches retrieved successfully.",
-      coaches,
+      coaches: sanitizedCoaches,
     });
   } catch (error) {
     console.error(error);
