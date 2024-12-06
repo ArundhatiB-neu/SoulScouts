@@ -66,8 +66,9 @@ const Settings = () => {
   };
 
   return (
-    <Container className="py-5">
+    <Container fluid>
       <Navbar/>
+      <div class="p-5">
       <br/><br/>
       <h2>Settings</h2>
       <br/>
@@ -206,6 +207,7 @@ const Settings = () => {
           Save Changes
         </Button>
       </Form>
+      </div>
     </Container>
   );
 };
