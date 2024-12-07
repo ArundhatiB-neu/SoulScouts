@@ -1,39 +1,49 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { Navbar, Nav, NavDropdown } from 'react-bootstrap';
+import { logoutUser, selectUserRole } from '../../redux/slices/authSlice';
 import logo from '../../Assets/soulscouts-logo.png';
 
 const Navigation = () => {
-  //const userRole = useSelector(state => state.auth.role);
-  const userRole = "hr";
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const userRole = useSelector(selectUserRole);
   
+  const handleLogout = async () => {
+    try {
+      await dispatch(logoutUser()).unwrap();
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout failed:', error);
+      // Still navigate to login even if logout fails
+      navigate('/login');
+    }
+  };
+
   const navLinks = {
     hr: [
       { title: 'HR Dashboard', path: '/hr-dashboard' },
       { title: 'HR Settings', path: '/settings' },
       { title: 'Employee Management', path: '/employee-management' },
       { title: 'Resource Library', path: '/library' },
-      { title: 'Manage Subscription', path: '/subscription' },
-      { title: 'Logout', path: '/login' }
+      { title: 'Manage Subscription', path: '/subscription' }
     ],
     employee: [
       { title: 'Employee Dashboard', path: '/employee-dashboard' },
       { title: 'Employee Settings', path: '/settings' },
       { title: 'Resource Library', path: '/library' },
-      { title: 'Journal', path: '/journal' },
-      { title: 'Logout', path: '/login' }
+      { title: 'Journal', path: '/journal' }
     ],
     coach: [
       { title: 'Coach Dashboard', path: '/coach-dashboard' },
       { title: 'Coach Settings', path: '/settings' },
-      { title: 'Resource Library', path: '/library' },
-      { title: 'Logout', path: '/login' }
+      { title: 'Resource Library', path: '/library' }
     ],
     admin: [
       { title: 'Coach Management', path: '/coach-management' },
       { title: 'Company Management', path: '/company-management' },
-      { title: 'Resource Library', path: '/library' },
-      { title: 'Logout', path: '/login' }
+      { title: 'Resource Library', path: '/library' }
     ]
   };
 
@@ -49,10 +59,21 @@ const Navigation = () => {
           align="end"
         >
           {navLinks[userRole]?.map((link, index) => (
-            <NavDropdown.Item key={index} href={link.path}>
+            <NavDropdown.Item 
+              key={index} 
+              href={link.path}
+            >
               {link.title}
             </NavDropdown.Item>
           ))}
+          {/* Separate logout item with onClick handler */}
+          <NavDropdown.Divider />
+          <NavDropdown.Item 
+            onClick={handleLogout}
+            className="text-danger"
+          >
+            Logout
+          </NavDropdown.Item>
         </NavDropdown>
       </div>
     </Navbar>

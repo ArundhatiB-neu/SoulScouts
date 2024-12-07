@@ -1,3 +1,328 @@
+RouteConfig:
+export const ROLES = {
+    ADMIN: 'admin',
+    HR: 'hr',
+    EMPLOYEE: 'employee',
+    COACH: 'coach'
+  };
+  
+  export const publicRoutes = [
+    { path: '/', component: 'Home' },
+    { path: '/login', component: 'Login' },
+    { path: '/signup', component: 'Signup' }
+  ];
+  
+  export const protectedRoutes = [
+    {
+      path: '/hr-dashboard',
+      component: 'HRDashboard',
+      allowedRoles: [ROLES.HR]
+    },
+    {
+      path: '/employee-dashboard',
+      component: 'EmployeeDashboard',
+      allowedRoles: [ROLES.EMPLOYEE]
+    },
+    {
+      path: '/coach-dashboard',
+      component: 'CoachDashboard',
+      allowedRoles: [ROLES.COACH]
+    },
+    {
+      path: '/company-management',
+      component: 'CompanyManagement',
+      allowedRoles: [ROLES.ADMIN]
+    },
+    {
+      path: '/coach-management',
+      component: 'CoachManagement',
+      allowedRoles: [ROLES.ADMIN]
+    },
+    {
+      path: '/employee-management',
+      component: 'EmployeeManagement',
+      allowedRoles: [ROLES.HR]
+    },
+    {
+      path: '/journal',
+      component: 'Journal',
+      allowedRoles: [ROLES.EMPLOYEE]
+    },
+    {
+      path: '/settings',
+      component: 'Settings',
+      allowedRoles: [ROLES.ADMIN, ROLES.HR, ROLES.EMPLOYEE, ROLES.COACH]
+    },
+    {
+      path: '/library',
+      component: 'ResourceLibrary',
+      allowedRoles: [ROLES.ADMIN, ROLES.HR, ROLES.EMPLOYEE, ROLES.COACH]
+    }
+  ];
+
+app.js:
+const express = require("express");
+const bodyParser = require("body-parser");
+const cors = require("cors");
+
+const hrRoutes = require("./routes/hrRoutes");
+const employeeRoutes = require("./routes/employeeRoutes");
+const coachRoutes = require("./routes/coachRoutes");
+const loginRoutes = require("./routes/loginRoutes");
+const authenticateToken = require("./middleware/authMiddleware");
+const logoutRoutes = require("./routes/logoutRoutes");
+const companyRoutes = require("./routes/companyRoutes");
+const wellnessSurveyRoutes = require("./routes/wellnessSurveyRoutes");
+const resourceRoutes = require("./routes/resourceRoutes");
+
+const app = express();
+
+// Middleware
+app.use(bodyParser.json());
+app.use(cors());
+
+const settingsRoutes = require('./routes/settingsRoutes');
+app.use('/settings', settingsRoutes);
+
+// Public Routes
+app.use("/register/hr", hrRoutes);
+// app.use("/register/coach", coachRoutes);
+app.use("/login", loginRoutes);
+
+// Consolidated Employee Routes
+app.use("/employee", employeeRoutes);
+
+// Consolidated Coach Routes
+app.use("/coach", coachRoutes);
+
+// Consolidated Company Routes
+app.use("/company", companyRoutes);
+
+app.use("/wellness-survey", wellnessSurveyRoutes);
+
+app.use("/resources", resourceRoutes);
+// Authenticated Routes Middleware
+app.use(authenticateToken);
+
+// Authenticated Routes
+app.use("/logout", logoutRoutes);
+
+module.exports = app;
+
+ProtectedRoute:
+import { Navigate, useLocation } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { selectAuth } from '../../redux/slices/authSlice';
+
+const ProtectedRoute = ({ children, allowedRoles }) => {
+  const { isAuthenticated, role } = useSelector(selectAuth);
+  const location = useLocation();
+
+  if (!isAuthenticated) {
+    // Redirect to login while saving the attempted route
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  if (allowedRoles && !allowedRoles.includes(role)) {
+    // Redirect to role-specific dashboard if authenticated but wrong role
+    const dashboardRoutes = {
+      hr: '/hr-dashboard',
+      employee: '/employee-dashboard',
+      coach: '/coach-dashboard',
+      admin: '/admin-dashboard'
+    };
+    return <Navigate to={dashboardRoutes[role] || '/'} replace />;
+  }
+
+  return children;
+};
+
+export default ProtectedRoute;
+
+authSlice:
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+
+// Async thunk for signup
+export const signupUser = createAsyncThunk(
+  'auth/signup',
+  async ({ userData, role }, { rejectWithValue }) => {
+    try {
+      const response = await fetch(`http://localhost:5001/register/${role}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return rejectWithValue(errorData.error || 'Signup failed');
+      }
+
+      const data = await response.json();
+      // Store token in localStorage
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('userRole', role);
+      return { ...data, role };
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+// Async thunk for login
+export const loginUser = createAsyncThunk(
+  'auth/login',
+  async ({ email, password, role }, { rejectWithValue }) => {
+    try {
+      const response = await fetch('http://localhost:5001/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password, role }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return rejectWithValue(errorData.error || 'Login failed');
+      }
+
+      const data = await response.json();
+      // Store token in localStorage
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('userRole', role);
+      return { ...data, role };
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+// Async thunk for logout
+export const logoutUser = createAsyncThunk(
+  'auth/logout',
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:5001/logout', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return rejectWithValue(errorData.error || 'Logout failed');
+      }
+
+      // Clear localStorage
+      localStorage.removeItem('token');
+      localStorage.removeItem('userRole');
+      return await response.json();
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+const initialState = {
+  user: null,
+  token: localStorage.getItem('token'),
+  role: localStorage.getItem('userRole'),
+  isAuthenticated: !!localStorage.getItem('token'),
+  loading: false,
+  error: null,
+  registrationSuccess: false,
+};
+
+const authSlice = createSlice({
+  name: 'auth',
+  initialState,
+  reducers: {
+    clearError: (state) => {
+      state.error = null;
+    },
+    resetRegistrationSuccess: (state) => {
+      state.registrationSuccess = false;
+    },
+  },
+  extraReducers: (builder) => {
+    // Signup cases
+    builder
+      .addCase(signupUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.registrationSuccess = false;
+      })
+      .addCase(signupUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.isAuthenticated = true;
+        state.user = action.payload.user;
+        state.token = action.payload.token;
+        state.role = action.payload.role;
+        state.registrationSuccess = true;
+        state.error = null;
+      })
+      .addCase(signupUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.registrationSuccess = false;
+      })
+
+    // Login cases
+      .addCase(loginUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(loginUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.isAuthenticated = true;
+        state.user = action.payload.user;
+        state.token = action.payload.token;
+        state.role = action.payload.role;
+        state.error = null;
+      })
+      .addCase(loginUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+    // Logout cases
+      .addCase(logoutUser.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(logoutUser.fulfilled, (state) => {
+        state.loading = false;
+        state.isAuthenticated = false;
+        state.user = null;
+        state.token = null;
+        state.role = null;
+        state.error = null;
+      })
+      .addCase(logoutUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+  },
+});
+
+export const { clearError, resetRegistrationSuccess } = authSlice.actions;
+
+// Selectors
+export const selectAuth = (state) => state.auth;
+export const selectIsAuthenticated = (state) => state.auth.isAuthenticated;
+export const selectUser = (state) => state.auth.user;
+export const selectUserRole = (state) => state.auth.role;
+export const selectAuthLoading = (state) => state.auth.loading;
+export const selectAuthError = (state) => state.auth.error;
+
+export default authSlice.reducer;
+
+Signup component:
 import React, { useState, useEffect } from 'react';
 import { Container, Tabs, Tab, Form, Button, Alert, InputGroup } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
@@ -23,16 +348,13 @@ const Signup = () => {
 
   // Role-based dashboard redirection
   useEffect(() => {
-    console.log('Navigation effect triggered:', { isAuthenticated, role }); // Debug log
     if (isAuthenticated && role) {
       const dashboardRoutes = {
         hr: '/hr-dashboard',
         employee: '/employee-dashboard',
         coach: '/coach-dashboard'
       };
-      const targetRoute = dashboardRoutes[role] || '/';
-      console.log('Navigating to:', targetRoute); // Debug log
-      navigate(targetRoute);
+      navigate(dashboardRoutes[role] || '/');
     }
   }, [isAuthenticated, role, navigate]);
 
@@ -181,23 +503,18 @@ const Signup = () => {
             };
             break;
             
-            case 'employee':
-  const selectedCompany = companies.list.find(c => c._id === form.company);
-  if (!selectedCompany) {
-    setErrors({ ...errors, company: 'Please select a valid company' });
-    return;
-  }
-  
-  userData = {
-    fullName: form.fullName,
-    companyId: form.company,
-    email: `${form.emailPrefix}${selectedCompany.domain}`,
-    domain: form.domain,
-    phone: form.phone,
-    password: form.password,
-    confirmPassword: form.confirmPassword
-  };
-  break;
+          case 'employee':
+            const company = companies.list.find(c => c.id === parseInt(form.company));
+            userData = {
+              fullName: form.fullName,
+              companyId: form.company,
+              email: `${form.emailPrefix}${company.domain}`,
+              domain: form.domain,
+              phone: form.phone,
+              password: form.password,
+              confirmPassword: form.confirmPassword
+            };
+            break;
             
           case 'coach':
             userData = {
@@ -274,33 +591,32 @@ const Signup = () => {
               </Form.Control.Feedback>
             </Form.Group>
 
-            {/* Replace the company and domain selects in HR Tab with: */}
-<Form.Group className="mb-3">
-  <Form.Label>Company Name</Form.Label>
-  <Form.Control
-    type="text"
-    value={hrForm.companyName}
-    onChange={(e) => setHrForm({...hrForm, companyName: e.target.value})}
-    isInvalid={!!errors.companyName}
-  />
-  <Form.Control.Feedback type="invalid">
-    {errors.companyName}
-  </Form.Control.Feedback>
-</Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Company Name</Form.Label>
+              <Form.Control
+                type="text"
+                value={hrForm.companyName}
+                onChange={(e) => setHrForm({...hrForm, companyName: e.target.value})}
+                isInvalid={!!errors.companyName}
+              />
+              <Form.Control.Feedback type="invalid">
+                {errors.companyName}
+              </Form.Control.Feedback>
+            </Form.Group>
 
-<Form.Group className="mb-3">
-  <Form.Label>Company Domain</Form.Label>
-  <Form.Control
-    type="text"
-    value={hrForm.domain}
-    onChange={(e) => setHrForm({...hrForm, domain: e.target.value})}
-    placeholder="@company.com"
-    isInvalid={!!errors.domain}
-  />
-  <Form.Control.Feedback type="invalid">
-    {errors.domain}
-  </Form.Control.Feedback>
-</Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Domain</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="@company.com"
+                value={hrForm.domain}
+                onChange={(e) => setHrForm({...hrForm, domain: e.target.value})}
+                isInvalid={!!errors.domain}
+              />
+              <Form.Control.Feedback type="invalid">
+                {errors.domain}
+              </Form.Control.Feedback>
+            </Form.Group>
 
             <Form.Group className="mb-3">
               <Form.Label>Password</Form.Label>
@@ -354,31 +670,30 @@ const Signup = () => {
             </Form.Group>
 
             <Form.Group className="mb-3">
-  <Form.Label>Company</Form.Label>
-  <Form.Select
-    value={employeeForm.company}
-    onChange={(e) => {
-      const selectedCompany = companies.list.find(c => c._id === e.target.value);
-      setEmployeeForm({
-        ...employeeForm,
-        company: e.target.value,
-        companyDomain: selectedCompany?.domain || '@company.com'
-      });
-      console.log('Selected company:', selectedCompany); // For debugging
-    }}
-    isInvalid={!!errors.company}
-  >
-    <option value="">Select Company</option>
-    {companies.list.map(company => (
-      <option key={company._id} value={company._id}>
-        {company.name}
-      </option>
-    ))}
-  </Form.Select>
-  <Form.Control.Feedback type="invalid">
-    {errors.company}
-  </Form.Control.Feedback>
-</Form.Group>
+              <Form.Label>Company</Form.Label>
+              <Form.Select
+                value={employeeForm.company}
+                onChange={(e) => {
+                  const selectedCompany = companies.list.find(c => c.id === parseInt(e.target.value));
+                  setEmployeeForm({
+                    ...employeeForm,
+                    company: e.target.value,
+                    companyDomain: selectedCompany?.domain || '@company.com'
+                  });
+                }}
+                isInvalid={!!errors.company}
+              >
+                <option value="">Select Company</option>
+                {companies.list.map(company => (
+                  <option key={company.id} value={company.id}>
+                    {company.name}
+                  </option>
+                ))}
+              </Form.Select>
+              <Form.Control.Feedback type="invalid">
+                {errors.company}
+              </Form.Control.Feedback>
+            </Form.Group>
 
             <Form.Group className="mb-3">
               <Form.Label>Email</Form.Label>
@@ -573,3 +888,70 @@ const Signup = () => {
 };
 
 export default Signup;
+
+CompanySlice:
+
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+
+export const fetchCompanies = createAsyncThunk(
+  'companies/fetchAll',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await fetch('http://localhost:5001/company/getAll');
+      if (!response.ok) throw new Error('Failed to fetch companies');
+      return await response.json();
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+const companySlice = createSlice({
+  name: 'companies',
+  initialState: {
+    list: [],
+    loading: false,
+    error: null
+  },
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchCompanies.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchCompanies.fulfilled, (state, action) => {
+        state.loading = false;
+        state.list = action.payload.companies;
+      })
+      .addCase(fetchCompanies.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+  }
+});
+
+export default companySlice.reducer;
+
+store.js:
+
+import { configureStore } from '@reduxjs/toolkit';
+import authReducer from './slices/authSlice';
+import resourcesReducer from './slices/resourcesSlice';
+import companyReducer from './slices/companySlice';
+import coachReducer from './slices/coachSlice';
+import employeeReducer from './slices/employeeSlice';
+import journalReducer from './slices/journalSlice';
+
+const store = configureStore({
+  reducer: {
+    auth: authReducer,
+    resources: resourcesReducer,
+    companies: companyReducer,
+    coaches: coachReducer,
+    employees: employeeReducer,
+    journal: journalReducer
+  }
+});
+
+export * from './slices/resourcesSlice';
+export default store;

@@ -13,7 +13,7 @@ const ResourceLibrary = () => {
   const categories = useSelector(state => state.resources.categories);
   //const userRole = useSelector(state => state.auth.role);
   const dispatch = useDispatch();
-  const userRole = "hr";
+  const userRole = "admin";
   
   const isAdmin = userRole === 'admin';
 
