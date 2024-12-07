@@ -4,7 +4,7 @@ const sessionSchema = new mongoose.Schema({
   type: {
     type: String,
     required: true,
-    enum: ["HR", "Employee", "Coach"],
+    enum: ["HR", "Employee", "Coach", "Admin"],
   },
   userId: {
     type: mongoose.Schema.Types.ObjectId,

@@ -1,7 +1,8 @@
 const Employee = require("../models/Employee");
 const HR = require("../models/HR");
 const Coach = require("../models/Coach");
-const Session = require("../models/Session"); // Import the Session model
+const Admin = require("../models/Admin");
+const Session = require("../models/Session");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { jwtSecret, jwtExpiry } = require("../config/jwtConfig");
@@ -26,7 +27,8 @@ exports.loginUser = async (req, res) => {
         .populate("company", "name domain")
         .populate("coach", "fullName email specialization")) ||
       (await HR.findOne({ email })) ||
-      (await Coach.findOne({ email }));
+      (await Coach.findOne({ email })) ||
+      (await Admin.findOne({ email }));
 
     if (!user) {
       return res.status(404).json({ error: "User not found." });
@@ -49,7 +51,7 @@ exports.loginUser = async (req, res) => {
     const token = jwt.sign(
       {
         id: user._id,
-        type: user.constructor.modelName, // Identify if HR, Employee, or Coach
+        type: user.constructor.modelName, // Identify if HR, Employee, Coach, or Admin
       },
       jwtSecret,
       { expiresIn: jwtExpiry }
