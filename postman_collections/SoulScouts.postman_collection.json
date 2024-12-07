@@ -7,6 +7,158 @@
 	},
 	"item": [
 		{
+			"name": "wellness-survey",
+			"item": [
+				{
+					"name": "filter by employeeid",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3NTM5MzQ2OGQzYWUwOTBmMDY1OTdjOSIsInR5cGUiOiJFbXBsb3llZSIsImlhdCI6MTczMzU0MTcxMiwiZXhwIjoxNzMzNTQyNjEyfQ.A1BtRyQBUMnb7T00fhJ_vuKIMdTVDg995dYtQM6OSvU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5001/wellness-survey/fetch?employeeId=6753bea758cf37ba9b01e5b0",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5001",
+							"path": [
+								"wellness-survey",
+								"fetch"
+							],
+							"query": [
+								{
+									"key": "employeeId",
+									"value": "6753bea758cf37ba9b01e5b0"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "filter by coachid",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3NTM5MzQ2OGQzYWUwOTBmMDY1OTdjOSIsInR5cGUiOiJFbXBsb3llZSIsImlhdCI6MTczMzU0MTcxMiwiZXhwIjoxNzMzNTQyNjEyfQ.A1BtRyQBUMnb7T00fhJ_vuKIMdTVDg995dYtQM6OSvU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5001/wellness-survey/fetch?coachId=67538b82010a53a4fb86f672",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5001",
+							"path": [
+								"wellness-survey",
+								"fetch"
+							],
+							"query": [
+								{
+									"key": "coachId",
+									"value": "67538b82010a53a4fb86f672"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "filter by companyid",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3NTM5MzQ2OGQzYWUwOTBmMDY1OTdjOSIsInR5cGUiOiJFbXBsb3llZSIsImlhdCI6MTczMzU0MTcxMiwiZXhwIjoxNzMzNTQyNjEyfQ.A1BtRyQBUMnb7T00fhJ_vuKIMdTVDg995dYtQM6OSvU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5001/wellness-survey/fetch?companyId=67538c35010a53a4fb86f685",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5001",
+							"path": [
+								"wellness-survey",
+								"fetch"
+							],
+							"query": [
+								{
+									"key": "companyId",
+									"value": "67538c35010a53a4fb86f685"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "submit survey",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3NTM5MzQ2OGQzYWUwOTBmMDY1OTdjOSIsInR5cGUiOiJFbXBsb3llZSIsImlhdCI6MTczMzU0MTcxMiwiZXhwIjoxNzMzNTQyNjEyfQ.A1BtRyQBUMnb7T00fhJ_vuKIMdTVDg995dYtQM6OSvU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"date\": \"2024-12-04\",\n  \"department\": \"Sales\",\n  \"physical\": 6.2,\n  \"mental\": 5.9,\n  \"workLife\": 6.0,\n  \"total\": 18.1,\n  \"employeeId\": \"6753bea758cf37ba9b01e5b0\",\n  \"companyId\": \"67538c35010a53a4fb86f685\",\n  \"coachId\": \"67538b82010a53a4fb86f672\",\n  \"analytics\": {\n    \"physicalWellness\": { \n      \"energyLevel\": \"Good\", \n      \"sleepHours\": \"6 to 8 hours\" \n    },\n    \"mentalWellness\": { \n      \"stressLevel\": \"Moderate\", \n      \"overwhelmedByWork\": \"Occasionally\" \n    },\n    \"workLifeBalance\": { \n      \"workBeyondOfficeHours\": \"Sometimes\", \n      \"disconnectFromWork\": \"Effectively\" \n    }\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5001/wellness-survey/submit",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5001",
+							"path": [
+								"wellness-survey",
+								"submit"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "HR signup",
 			"request": {
 				"method": "POST",
@@ -42,7 +194,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"fullName\": \"alfred\",\n  \"companyId\": \"67538c35010a53a4fb86f685\",\n  \"email\": \"butler@wayne.com\",\n  \"domain\": \"@wayne.com\",\n  \"phone\": \"+11234567890\",\n  \"password\": \"StrongP@ssw0rd\",\n  \"confirmPassword\": \"StrongP@ssw0rd\"\n}",
+					"raw": "{\n  \"fullName\": \"penguin\",\n  \"companyId\": \"67538c35010a53a4fb86f685\",\n  \"email\": \"penguin@wayne.com\",\n  \"domain\": \"@wayne.com\",\n  \"phone\": \"+11234567890\",\n  \"password\": \"StrongP@ssw0rd\",\n  \"confirmPassword\": \"StrongP@ssw0rd\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -204,7 +356,7 @@
 					"bearer": [
 						{
 							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3NTMzM2JiNjg5YzljNjEyNjBlNTQ0MiIsInR5cGUiOiJFbXBsb3llZSIsImlhdCI6MTczMzUyOTg4MywiZXhwIjoxNzMzNTMwNzgzfQ.ODYZxaA1xTOi1ANmB6LMRRibffWokPKkP72118WxA_c",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3NTM5MzQ2OGQzYWUwOTBmMDY1OTdjOSIsInR5cGUiOiJFbXBsb3llZSIsImlhdCI6MTczMzU0MTcxMiwiZXhwIjoxNzMzNTQyNjEyfQ.A1BtRyQBUMnb7T00fhJ_vuKIMdTVDg995dYtQM6OSvU",
 							"type": "string"
 						}
 					]
@@ -396,7 +548,7 @@
 					"bearer": [
 						{
 							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3NTMzM2JiNjg5YzljNjEyNjBlNTQ0MiIsInR5cGUiOiJFbXBsb3llZSIsImlhdCI6MTczMzUyOTg4MywiZXhwIjoxNzMzNTMwNzgzfQ.ODYZxaA1xTOi1ANmB6LMRRibffWokPKkP72118WxA_c",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3NTM5MzQ2OGQzYWUwOTBmMDY1OTdjOSIsInR5cGUiOiJFbXBsb3llZSIsImlhdCI6MTczMzU0MTcxMiwiZXhwIjoxNzMzNTQyNjEyfQ.A1BtRyQBUMnb7T00fhJ_vuKIMdTVDg995dYtQM6OSvU",
 							"type": "string"
 						}
 					]
@@ -405,7 +557,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"employeeId\": \"675393468d3ae090f06597c9\",\n  \"coachId\": \"67538b82010a53a4fb86f672\"\n}",
+					"raw": "{\n  \"employeeId\": \"6753bea758cf37ba9b01e5b0\",\n  \"coachId\": \"67538b82010a53a4fb86f672\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"

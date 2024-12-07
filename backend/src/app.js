@@ -9,6 +9,7 @@ const loginRoutes = require("./routes/loginRoutes");
 const authenticateToken = require("./middleware/authMiddleware");
 const logoutRoutes = require("./routes/logoutRoutes");
 const companyRoutes = require("./routes/companyRoutes");
+const wellnessSurveyRoutes = require("./routes/wellnessSurveyRoutes");
 
 const app = express();
 
@@ -29,6 +30,8 @@ app.use("/coach", coachRoutes);
 
 // Consolidated Company Routes
 app.use("/company", companyRoutes);
+
+app.use("/wellness-survey", wellnessSurveyRoutes);
 
 // Authenticated Routes Middleware
 app.use(authenticateToken);
