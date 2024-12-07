@@ -5,6 +5,7 @@ import companyReducer from './slices/companySlice';
 import coachReducer from './slices/coachSlice';
 import employeeReducer from './slices/employeeSlice';
 import journalReducer from './slices/journalSlice';
+import settingsReducer from './slices/settingsSlice';
 
 const store = configureStore({
   reducer: {
@@ -13,7 +14,8 @@ const store = configureStore({
     companies: companyReducer,
     coaches: coachReducer,
     employees: employeeReducer,
-    journal: journalReducer
+    journal: journalReducer,
+    settings: settingsReducer,
   }
 });
 

@@ -1,142 +1,205 @@
-// controllers/settingsController.js
-const HR = require("../models/HR");
+// settingsController.js
 const Employee = require("../models/Employee");
 const Coach = require("../models/Coach");
-const Admin = require("../models/Admin");
+const HR = require("../models/HR");
 const bcrypt = require("bcrypt");
 
-const validatePassword = (password) =>
-  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(password);
+// Helper function to validate phone number
+const isValidPhone = (phone) => {
+  if (!phone) return true; // Phone is optional
+  return /^(\+1|1)?\d{10}$/.test(phone);
+};
 
-const validatePhone = (phone) => /^(\+1|1)?\d{10}$/.test(phone);
+// Helper function to validate password
+const isValidPassword = (password) => {
+  return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(password);
+};
+
+// Helper function to get user model and populate options based on role
+const getUserModelAndPopulate = (type) => {
+  switch (type.toLowerCase()) {
+    case 'employee':
+      return {
+        model: Employee,
+        populate: { path: 'company', select: 'name domain' }
+      };
+    case 'coach':
+      return {
+        model: Coach,
+        populate: { path: 'company', select: 'name domain' }
+      };
+    case 'hr':
+      return {
+        model: HR,
+        populate: null
+      };
+    default:
+      throw new Error('Invalid user type');
+  }
+};
 
 exports.updateUserSettings = async (req, res) => {
   try {
-    const userId = req.user.id;
-    const userType = req.user.type;
+    const { id: userId, type: role } = req.user; // Update to match middleware structure
     const { fullName, phone, domain, specialization, emergencyContact } = req.body;
 
-    const UserModel = {
-      HR,
-      Employee,
-      Coach,
-      Admin
-    }[userType];
+    // Get appropriate model and populate options
+    const { model: UserModel, populate } = getUserModelAndPopulate(role);
+    const updateData = {};
 
-    const user = await UserModel.findById(userId);
-    if (!user) {
+    // Validate and set common fields
+    if (fullName) {
+      if (!/^[a-zA-Z\s]{2,50}$/.test(fullName)) {
+        return res.status(400).json({
+          error: "Full name must contain only letters and spaces (2-50 characters)"
+        });
+      }
+      updateData.fullName = fullName;
+    }
+
+    if (phone !== undefined) {
+      if (!isValidPhone(phone)) {
+        return res.status(400).json({
+          error: "Invalid phone number format. Must be a valid US phone number."
+        });
+      }
+      updateData.phone = phone;
+    }
+
+    // Handle role-specific updates
+    if (role === 'employee') {
+      if (domain) {
+        const validDomains = ['Engineering', 'Marketing', 'Sales'];
+        if (!validDomains.includes(domain)) {
+          return res.status(400).json({
+            error: "Invalid domain selection"
+          });
+        }
+        updateData.domain = domain;
+      }
+
+      if (emergencyContact) {
+        const { name, email, phone } = emergencyContact;
+        
+        // Allow empty emergency contact
+        if (name || email || phone) {
+          if (name && !/^[a-zA-Z\s]{2,50}$/.test(name)) {
+            return res.status(400).json({
+              error: "Emergency contact name must contain only letters and spaces"
+            });
+          }
+          
+          if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            return res.status(400).json({
+              error: "Invalid emergency contact email format"
+            });
+          }
+          
+          if (phone && !isValidPhone(phone)) {
+            return res.status(400).json({
+              error: "Invalid emergency contact phone number"
+            });
+          }
+        }
+        
+        updateData.emergencyContact = emergencyContact;
+      }
+    }
+
+    if (role === 'coach' && specialization) {
+      const validSpecializations = ['Therapy', 'Music Therapy', 'Art Therapy', 'Meditation', 'Yoga'];
+      if (!validSpecializations.includes(specialization)) {
+        return res.status(400).json({
+          error: "Invalid specialization selection"
+        });
+      }
+      updateData.specialization = specialization;
+    }
+
+    // Update user with population
+    let updatedUser;
+    if (populate) {
+      updatedUser = await UserModel.findByIdAndUpdate(
+        userId,
+        { $set: updateData },
+        { new: true, runValidators: true }
+      )
+      .select('-password')
+      .populate(populate);
+    } else {
+      updatedUser = await UserModel.findByIdAndUpdate(
+        userId,
+        { $set: updateData },
+        { new: true, runValidators: true }
+      )
+      .select('-password');
+    }
+
+    if (!updatedUser) {
       return res.status(404).json({ error: "User not found" });
     }
 
-    const updates = {};
-
-    // Handle common fields
-    if (fullName && userType !== 'Admin') {
-      if (!/^[a-zA-Z\s]{2,50}$/.test(fullName)) {
-        return res.status(400).json({ error: "Invalid full name format" });
-      }
-      updates.fullName = fullName;
-    }
-
-    if (phone) {
-      if (!validatePhone(phone)) {
-        return res.status(400).json({ error: "Invalid phone number format" });
-      }
-      updates.phone = phone;
-    }
-
-    // Handle role-specific fields
-    switch (userType) {
-      case 'Employee':
-        if (domain) {
-          if (!['Engineering', 'Marketing', 'Sales'].includes(domain)) {
-            return res.status(400).json({ error: "Invalid domain" });
-          }
-          updates.domain = domain;
-        }
-        if (emergencyContact) {
-          const { name, email, phone } = emergencyContact;
-          if (name && email && phone) {
-            if (!/^[a-zA-Z\s]{2,50}$/.test(name)) {
-              return res.status(400).json({ error: "Invalid emergency contact name" });
-            }
-            if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
-              return res.status(400).json({ error: "Invalid emergency contact email" });
-            }
-            if (!validatePhone(phone)) {
-              return res.status(400).json({ error: "Invalid emergency contact phone" });
-            }
-            updates.emergencyContact = emergencyContact;
-          }
-        }
-        break;
-
-      case 'Coach':
-        if (specialization) {
-          if (!['Therapy', 'Music Therapy', 'Art Therapy', 'Meditation', 'Yoga'].includes(specialization)) {
-            return res.status(400).json({ error: "Invalid specialization" });
-          }
-          updates.specialization = specialization;
-        }
-        break;
-    }
-
-    const updatedUser = await UserModel.findByIdAndUpdate(
-      userId,
-      { $set: updates },
-      { new: true, runValidators: true }
-    ).populate('company').populate('coach');
-
-    const { password, ...userWithoutPassword } = updatedUser.toObject();
-
     res.status(200).json({
       message: "Settings updated successfully",
-      user: userWithoutPassword
+      user: updatedUser
     });
+
   } catch (error) {
     console.error('Settings update error:', error);
-    res.status(500).json({ error: "An error occurred while updating settings" });
+    res.status(500).json({
+      error: "An error occurred while updating settings"
+    });
   }
 };
 
 exports.changePassword = async (req, res) => {
   try {
-    const userId = req.user.id;
-    const userType = req.user.type;
+    const { id: userId, type: role } = req.user; // Update to match middleware structure
     const { oldPassword, newPassword } = req.body;
 
-    const UserModel = {
-      HR,
-      Employee,
-      Coach,
-      Admin
-    }[userType];
-
-    const user = await UserModel.findById(userId);
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
+    if (!oldPassword || !newPassword) {
+      return res.status(400).json({
+        error: "Both current and new password are required"
+      });
     }
 
-    // Verify old password
-    const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
-    if (!isPasswordValid) {
-      return res.status(401).json({ error: "Current password is incorrect" });
-    }
-
-    // Validate new password
-    if (!validatePassword(newPassword)) {
+    if (!isValidPassword(newPassword)) {
       return res.status(400).json({
         error: "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character"
       });
     }
 
-    // Hash and update new password
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-    await UserModel.findByIdAndUpdate(userId, { password: hashedPassword });
+    const { model: UserModel } = getUserModelAndPopulate(role);
+    const user = await UserModel.findById(userId);
 
-    res.status(200).json({ message: "Password updated successfully" });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ error: "Current password is incorrect" });
+    }
+
+    const isSamePassword = await bcrypt.compare(newPassword, user.password);
+    if (isSamePassword) {
+      return res.status(400).json({
+        error: "New password must be different from current password"
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    await user.save();
+
+    res.status(200).json({
+      message: "Password updated successfully"
+    });
+
   } catch (error) {
     console.error('Password change error:', error);
-    res.status(500).json({ error: "An error occurred while changing password" });
+    res.status(500).json({
+      error: "An error occurred while changing password"
+    });
   }
 };
