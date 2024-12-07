@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Container, Tabs, Tab, Form, Button, Alert, InputGroup } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-//import { signupHR, signupEmployee, signupCoach } from '../../../redux/slices/authSlice';
+import { signupHR, signupEmployee, signupCoach } from '../../../Services/AuthService';
 import { Link } from 'react-router-dom';
 import { signupSuccess } from '../../../redux/slices/authSlice';
 import './Signup.css';
@@ -171,28 +171,49 @@ const { loading, error } = auth || {};
 //     }
 //   };
 
-const handleSubmit = (type) => (e) => {
-    e.preventDefault();
-    const form = type === 'hr' ? hrForm : type === 'employee' ? employeeForm : coachForm;
-    
-    if (validateForm(type, form)) {
-      let userData = {
-        ...form,
-        id: Date.now(),
-        role: type
-      };
+
+const handleSubmit = (type) => async (e) => {
+  e.preventDefault();
+  const form = type === 'hr' ? hrForm : type === 'employee' ? employeeForm : coachForm;
+  
+  let response; 
+
+  if (validateForm(type, form)) {
+    try {
+      let userData = { ...form };
       
       if (type === 'employee') {
-        const company = companies.list.find(c => c.id === parseInt(form.company));
+        const company = companies.list.find((c) => c.id === parseInt(form.company));
         userData.email = `${form.emailPrefix}${company.domain}`;
       } else if (type === 'coach') {
         userData.email = `${form.emailPrefix}@soulscouts.com`;
       }
+
+      if (type === 'hr') {
+        response = await signupHR(userData);
+      } else if (type === 'employee') {
+        response = await signupEmployee(userData);
+      } else if (type === 'coach') {
+        response = await signupCoach(userData);
+      } else {
+        throw new Error('Invalid user type');
+      }
   
+      if (response?.status === 201) {
+        dispatch(signupSuccess(response.data));
+        navigate('/dashboard');
+      }
+      
+
+      // Dispatch success and navigate to dashboard
       dispatch(signupSuccess(userData));
       navigate('/dashboard');
+    } catch (error) {
+      console.error('Signup failed:', error);
+      // Optionally handle error messaging to the user here
     }
-  };
+  }
+};
 
   return (
     <Container className="signup-container">
