@@ -8,7 +8,7 @@ const bcrypt = require("bcrypt");
 const { jwtSecret, jwtExpiry } = require("../config/jwtConfig");
 
 const TYPE_TO_ROLE = {
-  'Employee': 'employee',
+  'employee': 'employee',
   'HR': 'hr',
   'Coach': 'coach',
   'Admin': 'admin'
@@ -30,11 +30,11 @@ exports.loginUser = async (req, res) => {
 
     switch (role) {
       case 'employee':
-        user = await Employee.findOne({ email })
-          .populate("company", "name domain")
-          .populate("coach", "fullName email specialization");
-        userType = 'Employee';
-        break;
+    user = await Employee.findOne({ email })
+        .populate("company", "name domain")
+        .populate("coach", "fullName email specialization");
+    userType = 'employee';  // lowercase
+    break;
       case 'hr':
         user = await HR.findOne({ email });
         userType = 'HR';

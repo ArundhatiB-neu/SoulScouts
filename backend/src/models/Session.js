@@ -5,7 +5,7 @@ const sessionSchema = new mongoose.Schema({
   type: {
     type: String,
     required: true,
-    enum: ["Employee", "HR", "Coach", "Admin"], // Match the model names exactly
+    enum: ["employee", "HR", "Coach", "Admin"], // Match the model names exactly
   },
   userId: {
     type: mongoose.Schema.Types.ObjectId,
