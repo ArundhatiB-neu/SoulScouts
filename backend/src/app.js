@@ -10,6 +10,7 @@ const authenticateToken = require("./middleware/authMiddleware");
 const logoutRoutes = require("./routes/logoutRoutes");
 const companyRoutes = require("./routes/companyRoutes");
 const wellnessSurveyRoutes = require("./routes/wellnessSurveyRoutes");
+const resourceRoutes = require("./routes/resourceRoutes");
 
 const app = express();
 
@@ -33,6 +34,7 @@ app.use("/company", companyRoutes);
 
 app.use("/wellness-survey", wellnessSurveyRoutes);
 
+app.use("/resources", resourceRoutes);
 // Authenticated Routes Middleware
 app.use(authenticateToken);
 
