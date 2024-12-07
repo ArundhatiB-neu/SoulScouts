@@ -16,54 +16,54 @@ const EmployeeDashboard = () => {
   };
 
   const initialWellnessData = [
-    {
-      date: "2024-11-28",
-      physical: 6,
-      mental: 5.5,
-      workLife: 5.5,
-      total: 17,
-      analytics: {
-        physicalWellness: { energyLevel: "Excellent", sleepHours: "More than 8" },
-        mentalWellness: { stressLevel: "Low", overwhelmedByWork: "Rarely" },
-        workLifeBalance: { workBeyondOfficeHours: "Rarely", disconnectFromWork: "Very Effectively" }
-      }
-    },
-    {
-      date: "2024-11-29",
-      physical: 4.5,
-      mental: 4,
-      workLife: 4.5,
-      total: 13,
-      analytics: {
-        physicalWellness: { energyLevel: "Good", sleepHours: "7-8" },
-        mentalWellness: { stressLevel: "Moderate", overwhelmedByWork: "Sometimes" },
-        workLifeBalance: { workBeyondOfficeHours: "Sometimes", disconnectFromWork: "Usually" }
-      }
-    },
-    {
-      date: "2024-11-30",
-      physical: 3.5,
-      mental: 3,
-      workLife: 3,
-      total: 9.5,
-      analytics: {
-        physicalWellness: { energyLevel: "Low", sleepHours: "Less than 6" },
-        mentalWellness: { stressLevel: "Very High", overwhelmedByWork: "Very Often" },
-        workLifeBalance: { workBeyondOfficeHours: "Very Often", disconnectFromWork: "Not at all" }
-      }
-    },
-    {
-      date: "2024-12-01",
-      physical: 5,
-      mental: 4.5,
-      workLife: 4,
-      total: 13.5,
-      analytics: {
-        physicalWellness: { energyLevel: "Good", sleepHours: "7-8" },
-        mentalWellness: { stressLevel: "Moderate", overwhelmedByWork: "Sometimes" },
-        workLifeBalance: { workBeyondOfficeHours: "Sometimes", disconnectFromWork: "Usually" }
-      }
-    },
+    // {
+    //   date: "2024-11-28",
+    //   physical: 6,
+    //   mental: 5.5,
+    //   workLife: 5.5,
+    //   total: 17,
+    //   analytics: {
+    //     physicalWellness: { energyLevel: "Excellent", sleepHours: "More than 8" },
+    //     mentalWellness: { stressLevel: "Low", overwhelmedByWork: "Rarely" },
+    //     workLifeBalance: { workBeyondOfficeHours: "Rarely", disconnectFromWork: "Very Effectively" }
+    //   }
+    // },
+    // {
+    //   date: "2024-11-29",
+    //   physical: 4.5,
+    //   mental: 4,
+    //   workLife: 4.5,
+    //   total: 13,
+    //   analytics: {
+    //     physicalWellness: { energyLevel: "Good", sleepHours: "7-8" },
+    //     mentalWellness: { stressLevel: "Moderate", overwhelmedByWork: "Sometimes" },
+    //     workLifeBalance: { workBeyondOfficeHours: "Sometimes", disconnectFromWork: "Usually" }
+    //   }
+    // },
+    // {
+    //   date: "2024-11-30",
+    //   physical: 3.5,
+    //   mental: 3,
+    //   workLife: 3,
+    //   total: 9.5,
+    //   analytics: {
+    //     physicalWellness: { energyLevel: "Low", sleepHours: "Less than 6" },
+    //     mentalWellness: { stressLevel: "Very High", overwhelmedByWork: "Very Often" },
+    //     workLifeBalance: { workBeyondOfficeHours: "Very Often", disconnectFromWork: "Not at all" }
+    //   }
+    // },
+    // {
+    //   date: "2024-12-01",
+    //   physical: 5,
+    //   mental: 4.5,
+    //   workLife: 4,
+    //   total: 13.5,
+    //   analytics: {
+    //     physicalWellness: { energyLevel: "Good", sleepHours: "7-8" },
+    //     mentalWellness: { stressLevel: "Moderate", overwhelmedByWork: "Sometimes" },
+    //     workLifeBalance: { workBeyondOfficeHours: "Sometimes", disconnectFromWork: "Usually" }
+    //   }
+    // },
     {
       date: "2024-12-02",
       physical: 5.5,
@@ -100,7 +100,30 @@ const EmployeeDashboard = () => {
         workLifeBalance: { workBeyondOfficeHours: "Sometimes", disconnectFromWork: "Usually" }
       }
     },
-
+    {
+      date: "2024-12-05",
+      physical: 5,
+      mental: 4.5,
+      workLife: 4,
+      total: 13.5,
+      analytics: {
+        physicalWellness: { energyLevel: "Good", sleepHours: "7-8" },
+        mentalWellness: { stressLevel: "Moderate", overwhelmedByWork: "Sometimes" },
+        workLifeBalance: { workBeyondOfficeHours: "Sometimes", disconnectFromWork: "Usually" }
+      }
+    },
+    {
+      date: "2024-12-06",
+      physical: 6,
+      mental: 5.5,
+      workLife: 5.5,
+      total: 17,
+      analytics: {
+        physicalWellness: { energyLevel: "Excellent", sleepHours: "More than 8" },
+        mentalWellness: { stressLevel: "Low", overwhelmedByWork: "Rarely" },
+        workLifeBalance: { workBeyondOfficeHours: "Rarely", disconnectFromWork: "Very Effectively" }
+      }
+    },
   ];
 
   // State to manage wellness data
@@ -134,7 +157,52 @@ const EmployeeDashboard = () => {
   }, [currentUser.id]);
 
   // Handle form submission
-  const handleWellnessSubmit = async (newData) => {
+  // const handleWellnessSubmit = async (newData) => {
+  //   try {
+  //     const dateExists = wellnessData.some(entry => entry.date === newData.date);
+  
+  //     if (dateExists) {
+  //       setSubmitMessage('An entry already exists for this date. Please select a different date.');
+  //       return false;
+  //     }
+
+  //     // Add employee ID and department to the data
+  //     const wellnessEntry = {
+  //       ...newData,
+  //       employeeId: currentUser.id,
+  //       department: currentUser.department
+  //     };
+  
+  //     // Send to API
+  //     const response = await fetch('/api/wellness/submit', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify(wellnessEntry),
+  //     });
+
+  //     if (!response.ok) {
+  //       throw new Error('Failed to submit wellness data');
+  //     }
+
+  //     // Update local state
+  //     setWellnessData(prevData => {
+  //       const updatedData = [...prevData, wellnessEntry].sort((a, b) =>
+  //         new Date(a.date) - new Date(b.date)
+  //       );
+  //       return updatedData;
+  //     });
+  
+  //     setSubmitMessage('Wellness data saved successfully!');
+  //     return true;
+  //   } catch (error) {
+  //     setSubmitMessage('Error saving wellness data. Please try again.');
+  //     console.error('Error saving wellness data:', error);
+  //     return false;
+  //   }
+  // };
+  const handleWellnessSubmit = (newData) => {
     try {
       const dateExists = wellnessData.some(entry => entry.date === newData.date);
   
@@ -142,28 +210,15 @@ const EmployeeDashboard = () => {
         setSubmitMessage('An entry already exists for this date. Please select a different date.');
         return false;
       }
-
+  
       // Add employee ID and department to the data
       const wellnessEntry = {
         ...newData,
         employeeId: currentUser.id,
-        department: currentUser.department
+        department: currentUser.department,
       };
   
-      // Send to API
-      const response = await fetch('/api/wellness/submit', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(wellnessEntry),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to submit wellness data');
-      }
-
-      // Update local state
+      // Update local state directly
       setWellnessData(prevData => {
         const updatedData = [...prevData, wellnessEntry].sort((a, b) =>
           new Date(a.date) - new Date(b.date)
@@ -171,14 +226,15 @@ const EmployeeDashboard = () => {
         return updatedData;
       });
   
-      setSubmitMessage('Wellness data saved successfully!');
+      setSubmitMessage('Wellness data added successfully!');
       return true;
     } catch (error) {
-      setSubmitMessage('Error saving wellness data. Please try again.');
-      console.error('Error saving wellness data:', error);
+      setSubmitMessage('Error adding wellness data. Please try again.');
+      console.error('Error adding wellness data:', error);
       return false;
     }
   };
+  
 
   if (isLoading) {
     return <div>Loading...</div>;
