@@ -21,7 +21,6 @@ exports.loginUser = async (req, res) => {
   }
 
   try {
-    // Check if the user exists in all collections
     let user =
       (await Employee.findOne({ email })
         .populate("company", "name domain")
@@ -39,29 +38,36 @@ exports.loginUser = async (req, res) => {
       return res.status(401).json({ error: "Invalid email or password." });
     }
 
-    // Check for existing active session
+    // Check for existing session
     const existingSession = await Session.findOne({ userId: user._id });
+
     if (existingSession) {
-      return res
-        .status(400)
-        .json({ error: "User already logged in. Please log out first." });
+      // Verify if the session has expired
+      const now = new Date();
+      if (existingSession.expiresAt > now) {
+        return res.status(400).json({
+          error: "User already logged in. Please log out first.",
+        });
+      } else {
+        // Remove expired session
+        await Session.deleteOne({ _id: existingSession._id });
+      }
     }
 
-    // Generate JWT token
+    // Generate a new JWT token
     const token = jwt.sign(
       {
         id: user._id,
-        type: user.constructor.modelName, // Identify if HR, Employee, Coach, or Admin
+        type: user.constructor.modelName,
       },
       jwtSecret,
       { expiresIn: jwtExpiry }
     );
 
-    // Calculate token expiration time
     const expiresAt = new Date();
     expiresAt.setMinutes(expiresAt.getMinutes() + 15);
 
-    // Save token to the Session collection
+    // Save new session
     const newSession = new Session({
       type: user.constructor.modelName,
       userId: user._id,
@@ -72,7 +78,6 @@ exports.loginUser = async (req, res) => {
 
     await newSession.save();
 
-    // Prepare the response based on user type
     let responseUser = {
       id: user._id,
       fullName: user.fullName,
@@ -80,10 +85,9 @@ exports.loginUser = async (req, res) => {
       type: user.constructor.modelName,
     };
 
-    // including company and coach details for employees
     if (user.constructor.modelName === "Employee") {
-      responseUser.company = user.company; // Populated company details
-      responseUser.coach = user.coach; // Populated coach details, if any
+      responseUser.company = user.company;
+      responseUser.coach = user.coach;
     }
 
     res.status(200).json({
