@@ -168,7 +168,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"fullName\": \"Heather Kelley\",\n  \"email\": \"kelly.h@dailyplanet.com\",\n  \"phone\": \"1234567890\",\n  \"companyName\": \"Daily Planet\",\n  \"domain\": \"@dailyplanet.com\",\n  \"password\": \"SecureP@ssw0rd\",\n  \"confirmPassword\": \"SecureP@ssw0rd\"\n}",
+							"raw": "{\n  \"fullName\": \"Heather Kelley\",\n  \"email\": \"dleete.h@not.com\",\n  \"phone\": \"1234567890\",\n  \"companyName\": \"sample delete company\",\n  \"domain\": \"@not.com\",\n  \"password\": \"SecureP@ssw0rd\",\n  \"confirmPassword\": \"SecureP@ssw0rd\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -197,7 +197,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"fullName\": \"penguin\",\n  \"companyId\": \"67538c35010a53a4fb86f685\",\n  \"email\": \"penguin@wayne.com\",\n  \"domain\": \"@wayne.com\",\n  \"phone\": \"+11234567890\",\n  \"password\": \"StrongP@ssw0rd\",\n  \"confirmPassword\": \"StrongP@ssw0rd\"\n}",
+							"raw": "{\n  \"fullName\": \"sampleempl\",\n  \"companyId\": \"67546785d3391cdc03abcf2c\",\n  \"email\": \"sampleempl@not.com\",\n  \"domain\": \"@not.com\",\n  \"phone\": \"+11234567890\",\n  \"password\": \"StrongP@ssw0rd\",\n  \"confirmPassword\": \"StrongP@ssw0rd\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -417,7 +417,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"email\": \"hannah.sanders@soulscouts.com\",\n  \"password\": \"StrongP@ssw0rd\"\n}",
+							"raw": "{\n  \"email\": \"admin@soulscouts.com\",\n  \"password\": \"generic\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -491,6 +491,42 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "delete",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3NTNkN2MwNTYwNzA1MzVlMTFlMzA1MyIsInR5cGUiOiJBZG1pbiIsImlhdCI6MTczMzU4NDg3OSwiZXhwIjoxNzMzNTg1Nzc5fQ.PYJP9gHT268YUR3Aje0ET7ZMC1GVtTkVsKOnRxDdGzM",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5001/company/delete?id=67546785d3391cdc03abcf2c",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5001",
+							"path": [
+								"company",
+								"delete"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "67546785d3391cdc03abcf2c"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -505,7 +541,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3NTMzM2JiNjg5YzljNjEyNjBlNTQ0MiIsInR5cGUiOiJFbXBsb3llZSIsImlhdCI6MTczMzUyODgyOSwiZXhwIjoxNzMzNTI5NzI5fQ.ypGYZQ8wIVOf9JtBjAUkBqnJyqlCI5l7-drQugf39xM",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3NTNkN2MwNTYwNzA1MzVlMTFlMzA1MyIsInR5cGUiOiJBZG1pbiIsImlhdCI6MTczMzU4NDg3OSwiZXhwIjoxNzMzNTg1Nzc5fQ.PYJP9gHT268YUR3Aje0ET7ZMC1GVtTkVsKOnRxDdGzM",
 									"type": "string"
 								}
 							]
@@ -514,7 +550,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"coachId\": \"67538b82010a53a4fb86f672\",\n  \"companyId\": \"67538c35010a53a4fb86f685\"\n}",
+							"raw": "{\n  \"coachId\": \"67538bba010a53a4fb86f67b\",\n  \"companyId\": \"67546785d3391cdc03abcf2c\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
