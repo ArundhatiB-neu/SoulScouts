@@ -1,6 +1,7 @@
 const HR = require("../models/HR");
 const Company = require("../models/Company");
 const bcrypt = require("bcrypt");
+const { createAuthResponse } = require('./authenticationController');
 
 // Helper functions for validation
 const validateFullName = (name) => /^[a-zA-Z\s]+$/.test(name);
@@ -80,9 +81,8 @@ exports.registerHR = async (req, res) => {
     });
 
     const savedHR = await newHR.save();
-    res
-      .status(201)
-      .json({ message: "HR registered successfully.", hr: savedHR });
+    const response = await createAuthResponse(savedHR, 'HR');
+    res.status(201).json(response);
   } catch (error) {
     res.status(500).json({ error: "An error occurred during registration." });
   }

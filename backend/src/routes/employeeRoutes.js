@@ -11,7 +11,7 @@ const authenticateToken = require("../middleware/authMiddleware");
 const router = express.Router();
 
 // Register a new employee
-router.post("/register", registerEmployee);
+router.post("/", registerEmployee);
 
 // Update an employee
 router.put("/update/:id", authenticateToken, updateEmployee);

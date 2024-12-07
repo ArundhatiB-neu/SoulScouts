@@ -7,72 +7,80 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { jwtSecret, jwtExpiry } = require("../config/jwtConfig");
 
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const TYPE_TO_ROLE = {
+  'Employee': 'employee',
+  'HR': 'hr',
+  'Coach': 'coach',
+  'Admin': 'admin'
+};
 
 exports.loginUser = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, role } = req.body;
+
+  console.log('Login attempt:', { email, role }); // Debug log
 
   if (!email || !password) {
     return res.status(400).json({ error: "Email and password are required." });
   }
 
-  if (!emailRegex.test(email)) {
-    return res.status(400).json({ error: "Invalid email format." });
-  }
-
   try {
-    let user =
-      (await Employee.findOne({ email })
-        .populate("company", "name domain")
-        .populate("coach", "fullName email specialization")) ||
-      (await HR.findOne({ email })) ||
-      (await Coach.findOne({ email })) ||
-      (await Admin.findOne({ email }));
+    // Find user based on the provided role
+    let user;
+    let userType;
+
+    switch (role) {
+      case 'employee':
+        user = await Employee.findOne({ email })
+          .populate("company", "name domain")
+          .populate("coach", "fullName email specialization");
+        userType = 'Employee';
+        break;
+      case 'hr':
+        user = await HR.findOne({ email });
+        userType = 'HR';
+        break;
+      case 'coach':
+        user = await Coach.findOne({ email });
+        userType = 'Coach';
+        break;
+      case 'admin':
+        user = await Admin.findOne({ email });
+        userType = 'Admin';
+        break;
+      default:
+        return res.status(400).json({ error: "Invalid role specified." });
+    }
+
+    console.log('Found user:', !!user, 'Type:', userType); // Debug log
 
     if (!user) {
-      return res.status(404).json({ error: "User not found." });
+      return res.status(401).json({ error: "Invalid login credentials." });
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return res.status(401).json({ error: "Invalid email or password." });
+      return res.status(401).json({ error: "Invalid login credentials." });
     }
 
-    // Check for existing session
-    const existingSession = await Session.findOne({ userId: user._id });
+    // Clear existing sessions
+    await Session.deleteMany({ userId: user._id });
 
-    if (existingSession) {
-      // Verify if the session has expired
-      const now = new Date();
-      if (existingSession.expiresAt > now) {
-        return res.status(400).json({
-          error: "User already logged in. Please log out first.",
-        });
-      } else {
-        // Remove expired session
-        await Session.deleteOne({ _id: existingSession._id });
-      }
-    }
-
-    // Generate a new JWT token
     const token = jwt.sign(
       {
         id: user._id,
-        type: user.constructor.modelName,
+        type: userType
       },
       jwtSecret,
       { expiresIn: jwtExpiry }
     );
 
     const expiresAt = new Date();
-    expiresAt.setMinutes(expiresAt.getMinutes() + 15);
+    expiresAt.setHours(expiresAt.getHours() + 24);
 
-    // Save new session
     const newSession = new Session({
-      type: user.constructor.modelName,
+      type: userType,
       userId: user._id,
       token,
-      createdAt: new Date(),
       expiresAt,
     });
 
@@ -82,10 +90,10 @@ exports.loginUser = async (req, res) => {
       id: user._id,
       fullName: user.fullName,
       email: user.email,
-      type: user.constructor.modelName,
+      role: role // Use the provided role since we've already validated it
     };
 
-    if (user.constructor.modelName === "Employee") {
+    if (role === 'employee') {
       responseUser.company = user.company;
       responseUser.coach = user.coach;
     }
@@ -94,9 +102,13 @@ exports.loginUser = async (req, res) => {
       message: "Login successful.",
       user: responseUser,
       token,
+      role
     });
   } catch (error) {
-    console.error(error);
+    console.error('Login error:', {
+      message: error.message,
+      stack: error.stack
+    });
     res.status(500).json({ error: "An error occurred during login." });
   }
 };

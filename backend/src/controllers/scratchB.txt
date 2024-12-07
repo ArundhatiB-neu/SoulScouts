@@ -1,0 +1,860 @@
+Backend:
+
+Controllers:
+
+CoachController:
+const Coach = require("../models/Coach");
+const bcrypt = require("bcrypt");
+const Company = require("../models/Company");
+
+exports.registerCoach = async (req, res) => {
+  const { fullName, email, phone, specialization, password, confirmPassword } =
+    req.body;
+
+  // Validate required fields
+  if (!fullName || !email || !specialization || !password || !confirmPassword) {
+    return res
+      .status(400)
+      .json({ error: "All fields except phone are required." });
+  }
+
+  // Full name validation: letters and spaces only
+  const fullNameRegex = /^[a-zA-Z\s]+$/;
+  if (!fullNameRegex.test(fullName)) {
+    return res
+      .status(400)
+      .json({ error: "Full name can only contain letters and spaces." });
+  }
+
+  // Email validation: must be @soulscouts.com
+  const emailRegex = /^[^\s@]+@soulscouts\.com$/;
+  if (!emailRegex.test(email)) {
+    return res
+      .status(400)
+      .json({ error: "Email must be an @soulscouts.com email." });
+  }
+
+  // Phone validation: optional but must be a valid US phone number if provided
+  const phoneRegex = /^(\+1|1)?\d{10}$/;
+  if (phone && !phoneRegex.test(phone)) {
+    return res.status(400).json({
+      error: "Invalid phone number. Must be a valid US phone number.",
+    });
+  }
+
+  // Password validation: strong password (minimum 8 characters, 1 uppercase, 1 lowercase, 1 digit, 1 special character)
+  const passwordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  if (!passwordRegex.test(password)) {
+    return res.status(400).json({
+      error:
+        "Password must be at least 8 characters long and include one uppercase letter, one lowercase letter, one number, and one special character.",
+    });
+  }
+
+  // Validate password match
+  if (password !== confirmPassword) {
+    return res.status(400).json({ error: "Passwords do not match." });
+  }
+
+  try {
+    // Check if email already exists
+    const existingCoach = await Coach.findOne({ email });
+    if (existingCoach) {
+      return res
+        .status(400)
+        .json({ error: "A coach with this email already exists." });
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create new coach
+    const newCoach = new Coach({
+      fullName,
+      email,
+      phone,
+      specialization,
+      password: hashedPassword,
+    });
+
+    const savedCoach = await newCoach.save();
+    const response = await createAuthResponse(savedCoach, 'Coach');
+    res.status(201).json(response);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "An error occurred during coach registration." });
+  }
+};
+
+exports.assignCompany = async (req, res) => {
+  const { coachId, companyId } = req.body;
+
+  try {
+    // Validate coach and company IDs
+    if (!coachId || !companyId) {
+      return res
+        .status(400)
+        .json({ error: "Coach ID and Company ID are required." });
+    }
+
+    // Verify if the coach exists
+    const coach = await Coach.findById(coachId);
+    if (!coach) {
+      return res.status(404).json({ error: "Coach not found." });
+    }
+
+    // Verify if the company exists
+    const company = await Company.findById(companyId);
+    if (!company) {
+      return res.status(404).json({ error: "Company not found." });
+    }
+
+    // Assign company to coach
+    coach.company = companyId;
+    await coach.save();
+
+    res.status(200).json({
+      message: "Company assigned to coach successfully.",
+      coach,
+    });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while assigning the company." });
+  }
+};
+
+exports.getAllCoaches = async (req, res) => {
+  try {
+    const { company } = req.query; // Optional company ID filter from query params
+    const query = company ? { company } : {}; // filter by company if provided
+    const coaches = await Coach.find(query).populate("company", "name domain");
+
+    if (!coaches || coaches.length === 0) {
+      return res.status(404).json({ error: "No coaches found." });
+    }
+    const sanitizedCoaches = coaches.map((coach) => {
+      const { password, ...rest } = coach.toObject();
+      return rest;
+    });
+
+    res.status(200).json({
+      message: "Coaches retrieved successfully.",
+      coaches: sanitizedCoaches,
+    });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while fetching coaches." });
+  }
+};
+
+CompanyController:
+
+const Company = require("../models/Company");
+
+exports.getAllCompanies = async (req, res) => {
+  try {
+    const companies = await Company.find({}, { name: 1, domain: 1 }); // Fetch only relevant fields (e.g., name and domain)
+    if (!companies || companies.length === 0) {
+      return res.status(404).json({ error: "No companies found." });
+    }
+    res.status(200).json({
+      message: "Companies retrieved successfully.",
+      companies,
+    });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while fetching companies." });
+  }
+};
+
+EmployeeController:
+const Employee = require("../models/Employee");
+const Company = require("../models/Company");
+const bcrypt = require("bcrypt");
+const Coach = require("../models/Coach");
+
+exports.registerEmployee = async (req, res) => {
+  const {
+    fullName,
+    companyId,
+    email,
+    domain,
+    phone,
+    password,
+    confirmPassword,
+  } = req.body;
+
+  // Validate required fields
+  if (
+    !fullName ||
+    !companyId ||
+    !email ||
+    !domain ||
+    !password ||
+    !confirmPassword
+  ) {
+    return res
+      .status(400)
+      .json({ error: "All fields except phone are required." });
+  }
+
+  // Validate password match
+  if (password !== confirmPassword) {
+    return res.status(400).json({ error: "Passwords do not match." });
+  }
+
+  try {
+    // Check if company exists
+    const companyExists = await Company.findById(companyId);
+    if (!companyExists) {
+      return res
+        .status(404)
+        .json({ error: "Company not found. Please contact your admin." });
+    }
+
+    // Check if email already exists
+    const existingEmployee = await Employee.findOne({ email });
+    if (existingEmployee) {
+      return res
+        .status(400)
+        .json({ error: "An employee with this email already exists." });
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create new employee
+    const newEmployee = new Employee({
+      fullName,
+      company: companyId,
+      email,
+      domain,
+      phone,
+      password: hashedPassword,
+    });
+
+    const savedEmployee = await newEmployee.save();
+    const response = await createAuthResponse(savedEmployee, 'Employee');
+    res.status(201).json(response);
+  } catch (error) {
+    res.status(500).json({ error: "An error occurred during employee registration." });
+  }
+};
+
+exports.updateEmployee = async (req, res) => {
+  const { id } = req.params; // Employee ID from request parameters
+  const { phone, newPassword } = req.body;
+
+  try {
+    // Validate if at least one field is provided
+    if (!phone && !newPassword) {
+      return res.status(400).json({ error: "Please provide data to update." });
+    }
+
+    // Validate US phone number if provided
+    if (phone) {
+      const phoneRegex = /^(\+1|1)?\d{10}$/;
+      if (!phoneRegex.test(phone)) {
+        return res.status(400).json({
+          error: "Invalid phone number. It must be a valid US phone number.",
+        });
+      }
+    }
+
+    // Validate password if provided
+    if (newPassword) {
+      const passwordRegex =
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+      if (!passwordRegex.test(newPassword)) {
+        return res.status(400).json({
+          error:
+            "Password must be at least 8 characters long and include one uppercase letter, one lowercase letter, one number, and one special character.",
+        });
+      }
+
+      // Fetch the existing employee to compare the password
+      const employee = await Employee.findById(id);
+      if (!employee) {
+        return res.status(404).json({ error: "Employee not found." });
+      }
+
+      const isSamePassword = await bcrypt.compare(
+        newPassword,
+        employee.password
+      );
+      if (isSamePassword) {
+        return res.status(400).json({
+          error: "The new password cannot be the same as the old password.",
+        });
+      }
+    }
+
+    // Update employee details
+    const updates = {};
+    if (phone) updates.phone = phone;
+    if (newPassword) {
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      updates.password = hashedPassword;
+    }
+
+    const updatedEmployee = await Employee.findByIdAndUpdate(
+      id,
+      { $set: updates },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedEmployee) {
+      return res.status(404).json({ error: "Employee not found." });
+    }
+
+    res.status(200).json({
+      message: "Employee updated successfully.",
+      employee: updatedEmployee,
+    });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while updating the employee." });
+  }
+};
+
+// Get all employees by company name
+exports.getAllEmployees = async (req, res) => {
+  const { companyId } = req.query; // Company ID passed as a query parameter
+
+  try {
+    // Validate if companyId is provided
+    if (!companyId) {
+      return res.status(400).json({ error: "Company ID is required." });
+    }
+
+    // Fetch all employees associated with the company, populating company and coach details
+    const employees = await Employee.find({ company: companyId })
+      .populate("company", "name domain") // Populate company details
+      .populate("coach", "fullName email specialization"); // Populate coach details if present
+
+    // Check if employees exist
+    if (!employees || employees.length === 0) {
+      return res
+        .status(404)
+        .json({ error: "No employees found for this company." });
+    }
+
+    // Return employees excluding their passwords
+    const filteredEmployees = employees.map((employee) => {
+      const { password, ...rest } = employee._doc;
+      return rest;
+    });
+
+    res.status(200).json({
+      message: "Employees retrieved successfully.",
+      employees: filteredEmployees,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: "An error occurred while fetching employees.",
+    });
+  }
+};
+
+// Delete an employee by ID
+exports.deleteEmployees = async (req, res) => {
+  const { id } = req.params; // Get the employee ID from route parameters
+
+  try {
+    const deletedEmployee = await Employee.findByIdAndDelete(id, {
+      projection: { password: 0 },
+    });
+
+    if (!deletedEmployee) {
+      return res.status(404).json({ error: "Employee not found." });
+    }
+    const { password, ...employeeWithoutPassword } = deletedEmployee._doc;
+
+    res.status(200).json({
+      message: "Employee deleted successfully.",
+      employee: employeeWithoutPassword,
+    });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while deleting the employee." });
+  }
+};
+
+exports.assignCoach = async (req, res) => {
+  const { employeeId, coachId } = req.body;
+
+  try {
+    // Validate if both IDs are provided
+    if (!employeeId || !coachId) {
+      return res
+        .status(400)
+        .json({ error: "Employee ID and Coach ID are required." });
+    }
+
+    // Check if employee exists
+    const employee = await Employee.findById(employeeId);
+    if (!employee) {
+      return res.status(404).json({ error: "Employee not found." });
+    }
+
+    // Check if coach exists
+    const coach = await Coach.findById(coachId);
+    if (!coach) {
+      return res.status(404).json({ error: "Coach not found." });
+    }
+
+    // Assign the coach to the employee
+    employee.coach = coachId;
+    const updatedEmployee = await employee.save();
+
+    res.status(200).json({
+      message: "Coach assigned to employee successfully.",
+      employee: updatedEmployee,
+    });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while assigning the coach." });
+  }
+};
+
+HRController:
+const HR = require("../models/HR");
+const Company = require("../models/Company");
+const bcrypt = require("bcrypt");
+
+// Helper functions for validation
+const validateFullName = (name) => /^[a-zA-Z\s]+$/.test(name);
+const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+const validatePhone = (phone) =>
+  /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/.test(phone); // US phone numbers
+const validateCompanyName = (name) => /^[a-zA-Z\s]+$/.test(name);
+const validateDomain = (domain) =>
+  /^@[a-zA-Z0-9-]+\.[a-zA-Z]{2,}$/.test(domain);
+const validatePassword = (password) =>
+  /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(password); // At least 8 characters, 1 letter, 1 number, 1 special character
+
+exports.registerHR = async (req, res) => {
+  const {
+    fullName,
+    email,
+    phone,
+    companyName,
+    domain,
+    password,
+    confirmPassword,
+  } = req.body;
+
+  if (!validateFullName(fullName)) {
+    return res
+      .status(400)
+      .json({ error: "Invalid full name. Letters and spaces only." });
+  }
+  if (!validateEmail(email)) {
+    return res.status(400).json({ error: "Invalid email format." });
+  }
+  if (phone && !validatePhone(phone)) {
+    return res.status(400).json({ error: "Invalid US phone number format." });
+  }
+  if (!validateCompanyName(companyName)) {
+    return res
+      .status(400)
+      .json({ error: "Invalid company name. Letters and spaces only." });
+  }
+  if (!validateDomain(domain)) {
+    return res
+      .status(400)
+      .json({ error: "Invalid domain format. Should be like @company.com." });
+  }
+  if (!validatePassword(password)) {
+    return res.status(400).json({
+      error:
+        "Password must be at least 8 characters long, contain at least one letter, one number, and one special character.",
+    });
+  }
+  if (password !== confirmPassword) {
+    return res.status(400).json({ error: "Passwords do not match." });
+  }
+
+  try {
+    const existingHR = await HR.findOne({ email });
+    if (existingHR) {
+      return res
+        .status(400)
+        .json({ error: "HR with this email already exists." });
+    }
+
+    const existingCompany = await Company.findOne({ domain });
+    if (!existingCompany) {
+      const newCompany = new Company({ name: companyName, domain });
+      await newCompany.save();
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newHR = new HR({
+      fullName,
+      email,
+      phone,
+      companyName,
+      domain,
+      password: hashedPassword,
+    });
+
+    const savedHR = await newHR.save();
+    const response = await createAuthResponse(savedHR, 'HR');
+    res.status(201).json(response);
+  } catch (error) {
+    res.status(500).json({ error: "An error occurred during registration." });
+  }
+};
+
+
+Models:
+
+const mongoose = require("mongoose");
+
+const adminSchema = new mongoose.Schema({
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    match: /^[^\s@]+@soulscouts\.com$/,
+  },
+  password: {
+    type: String,
+    required: true,
+  },
+});
+
+module.exports = mongoose.model("Admin", adminSchema);
+
+const mongoose = require("mongoose");
+
+const coachSchema = new mongoose.Schema({
+  fullName: {
+    type: String,
+    required: true,
+    match: /^[a-zA-Z\s]{2,50}$/,
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    match: /^[^\s@]+@soulscouts\.com$/,
+  },
+  phone: {
+    type: String,
+    match: /^(\+1|1)?\d{10}$/,
+    required: false,
+  },
+  specialization: {
+    type: String,
+    required: true,
+  },
+  password: {
+    type: String,
+    required: true,
+  },
+  company: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Company", // Reference to the Company model
+    required: false,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
+module.exports = mongoose.model("Coach", coachSchema);
+
+const mongoose = require("mongoose");
+
+const companySchema = new mongoose.Schema({
+  name: { type: String, required: true, unique: true },
+  domain: { type: String, required: true, unique: true },
+  createdAt: { type: Date, default: Date.now },
+});
+
+module.exports = mongoose.model("Company", companySchema);
+
+const mongoose = require("mongoose");
+
+const employeeSchema = new mongoose.Schema({
+  fullName: {
+    type: String,
+    required: true,
+    match: /^[a-zA-Z\s]{2,50}$/,
+  },
+  company: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Company",
+    required: true,
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    match: /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/,
+  },
+  domain: {
+    type: String,
+    required: true,
+  },
+  phone: {
+    type: String,
+    match: /^(\+1|1)?\d{10}$/,
+    required: false,
+  },
+  password: {
+    type: String,
+    required: true,
+  },
+  coach: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Coach",
+    required: false,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
+module.exports = mongoose.model("Employee", employeeSchema);
+
+const mongoose = require("mongoose");
+
+const hrSchema = new mongoose.Schema({
+  fullName: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  phone: { type: String, required: false }, // Optional
+  companyName: { type: String, required: true },
+  domain: { type: String, required: true },
+  password: { type: String, required: true },
+  createdAt: { type: Date, default: Date.now },
+});
+
+module.exports = mongoose.model("HR", hrSchema);
+
+
+const mongoose = require("mongoose");
+
+const sessionSchema = new mongoose.Schema({
+  type: {
+    type: String,
+    required: true,
+    enum: ["HR", "Employee", "Coach", "Admin"],
+  },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+  },
+  token: {
+    type: String,
+    required: true,
+  },
+  expiresAt: {
+    type: Date,
+    required: true,
+  },
+});
+
+module.exports = mongoose.model("Session", sessionSchema);
+
+
+Routes:
+
+CoachRoutes:
+const express = require("express");
+const {
+  registerCoach,
+  assignCompany,
+  getAllCoaches,
+} = require("../controllers/coachController");
+const router = express.Router();
+const authMiddleware = require("../middleware/authMiddleware");
+
+router.post("/", registerCoach);
+router.post("/assign-company", authMiddleware, assignCompany);
+router.get("/getAll", authMiddleware, getAllCoaches);
+
+
+module.exports = router;
+
+CompanyRoutes:
+const express = require("express");
+const { getAllCompanies } = require("../controllers/companyController");
+const router = express.Router();
+
+router.get("/getAll", getAllCompanies);
+
+module.exports = router;
+
+
+EmployeeRoutes:
+const express = require("express");
+const {
+  registerEmployee,
+  updateEmployee,
+  getAllEmployees,
+  deleteEmployees,
+  assignCoach,
+} = require("../controllers/employeeController");
+const authenticateToken = require("../middleware/authMiddleware");
+
+const router = express.Router();
+
+// Register a new employee
+router.post("/", registerEmployee);
+
+// Update an employee
+router.put("/update/:id", authenticateToken, updateEmployee);
+
+// Assign a coach to an employee
+router.post("/assign-coach", authenticateToken, assignCoach);
+
+// Get all employees for a company
+router.get("/getAll", authenticateToken, getAllEmployees);
+
+// Delete an employee
+router.get("/delete/:id", authenticateToken, deleteEmployees);
+
+module.exports = router;
+
+HRRoutes:
+const express = require("express");
+const { registerHR } = require("../controllers/hrController");
+const router = express.Router();
+
+router.post("/", registerHR);
+
+module.exports = router;
+
+
+app.js (backend):
+
+const express = require("express");
+const bodyParser = require("body-parser");
+const cors = require("cors");
+
+const hrRoutes = require("./routes/hrRoutes");
+const employeeRoutes = require("./routes/employeeRoutes");
+const coachRoutes = require("./routes/coachRoutes");
+const loginRoutes = require("./routes/loginRoutes");
+const authenticateToken = require("./middleware/authMiddleware");
+const logoutRoutes = require("./routes/logoutRoutes");
+const companyRoutes = require("./routes/companyRoutes");
+const wellnessSurveyRoutes = require("./routes/wellnessSurveyRoutes");
+const resourceRoutes = require("./routes/resourceRoutes");
+
+const app = express();
+
+// Middleware
+app.use(bodyParser.json());
+app.use(cors());
+
+const settingsRoutes = require('./routes/settingsRoutes');
+app.use('/settings', settingsRoutes);
+
+// Public Routes
+app.use("/register/hr", hrRoutes);
+app.use("/register/coach", coachRoutes);
+app.use("/login", loginRoutes);
+
+// Consolidated Employee Routes
+app.use("/employee", employeeRoutes);
+
+// Consolidated Coach Routes
+app.use("/coach", coachRoutes);
+
+// Consolidated Company Routes
+app.use("/company", companyRoutes);
+
+app.use("/wellness-survey", wellnessSurveyRoutes);
+
+app.use("/resources", resourceRoutes);
+// Authenticated Routes Middleware
+app.use(authenticateToken);
+
+// Authenticated Routes
+app.use("/logout", logoutRoutes);
+
+module.exports = app;
+
+server.js:
+const mongoose = require("mongoose");
+const app = require("./app");
+const PORT = 5001;
+
+mongoose
+  .connect("mongodb://127.0.0.1:27017/SoulScout", {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => {
+    console.log("Connected to MongoDB SoulScout database");
+    app.listen(PORT, () => {
+      console.log(`Server running on http://localhost:${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error("MongoDB connection error:", err);
+  });
+
+
+authenticationController:
+
+const jwt = require('jsonwebtoken');
+const Session = require('../models/Session');
+
+// Utility function to generate tokens
+const generateAuthToken = async (userId, type) => {
+  const token = jwt.sign(
+    { userId, type },
+    process.env.JWT_SECRET || 'your-secret-key',
+    { expiresIn: '24h' }
+  );
+
+  // Store session
+  const session = new Session({
+    type,
+    userId,
+    token,
+    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
+  });
+  await session.save();
+
+  return token;
+};
+
+// Standardized response handler
+const createAuthResponse = async (user, type) => {
+  const token = await generateAuthToken(user._id, type);
+  const { password, ...userWithoutPassword } = user.toObject();
+  
+  return {
+    message: `${type} registered successfully`,
+    token,
+    user: userWithoutPassword,
+    role: type.toLowerCase()
+  };
+};
+
+module.exports = {
+  generateAuthToken,
+  createAuthResponse
+};

@@ -2,6 +2,7 @@ const Employee = require("../models/Employee");
 const Company = require("../models/Company");
 const bcrypt = require("bcrypt");
 const Coach = require("../models/Coach");
+const { createAuthResponse } = require('./authenticationController');
 
 exports.registerEmployee = async (req, res) => {
   const {
@@ -14,26 +15,26 @@ exports.registerEmployee = async (req, res) => {
     confirmPassword,
   } = req.body;
 
-  // Validate required fields
-  if (
-    !fullName ||
-    !companyId ||
-    !email ||
-    !domain ||
-    !password ||
-    !confirmPassword
-  ) {
-    return res
-      .status(400)
-      .json({ error: "All fields except phone are required." });
-  }
-
-  // Validate password match
-  if (password !== confirmPassword) {
-    return res.status(400).json({ error: "Passwords do not match." });
-  }
-
   try {
+    // Validate required fields
+    if (
+      !fullName ||
+      !companyId ||
+      !email ||
+      !domain ||
+      !password ||
+      !confirmPassword
+    ) {
+      return res
+        .status(400)
+        .json({ error: "All fields except phone are required." });
+    }
+
+    // Validate password match
+    if (password !== confirmPassword) {
+      return res.status(400).json({ error: "Passwords do not match." });
+    }
+
     // Check if company exists
     const companyExists = await Company.findById(companyId);
     if (!companyExists) {
@@ -63,16 +64,21 @@ exports.registerEmployee = async (req, res) => {
       password: hashedPassword,
     });
 
+    // Save the employee
     const savedEmployee = await newEmployee.save();
-    res.status(201).json({
-      message: "Employee registered successfully.",
-      employee: savedEmployee,
-    });
+
+    // Generate auth response using the utility function
+    const authResponse = await createAuthResponse(savedEmployee, 'employee');
+
+    // Send the response
+    return res.status(201).json(authResponse);
+
   } catch (error) {
-    console.error(error);
-    res
-      .status(500)
-      .json({ error: "An error occurred during employee registration." });
+    console.error("Employee registration error:", error);
+    return res.status(500).json({ 
+      error: "An error occurred during employee registration.",
+      details: error.message
+    });
   }
 };
 

@@ -1,6 +1,7 @@
 const Coach = require("../models/Coach");
 const bcrypt = require("bcrypt");
 const Company = require("../models/Company");
+const { createAuthResponse } = require('./authenticationController');
 
 exports.registerCoach = async (req, res) => {
   const { fullName, email, phone, specialization, password, confirmPassword } =
@@ -74,15 +75,11 @@ exports.registerCoach = async (req, res) => {
     });
 
     const savedCoach = await newCoach.save();
-    res.status(201).json({
-      message: "Coach registered successfully.",
-      coach: savedCoach,
-    });
+    const response = await createAuthResponse(savedCoach, 'Coach');
+    res.status(201).json(response);
   } catch (error) {
     console.error(error);
-    res
-      .status(500)
-      .json({ error: "An error occurred during coach registration." });
+    res.status(500).json({ error: "An error occurred during coach registration." });
   }
 };
 

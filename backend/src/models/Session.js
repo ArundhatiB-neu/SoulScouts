@@ -1,10 +1,11 @@
+// models/Session.js
 const mongoose = require("mongoose");
 
 const sessionSchema = new mongoose.Schema({
   type: {
     type: String,
     required: true,
-    enum: ["HR", "Employee", "Coach", "Admin"],
+    enum: ["Employee", "HR", "Coach", "Admin"], // Match the model names exactly
   },
   userId: {
     type: mongoose.Schema.Types.ObjectId,

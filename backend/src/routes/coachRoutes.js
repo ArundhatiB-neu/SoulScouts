@@ -7,7 +7,7 @@ const {
 const router = express.Router();
 const authMiddleware = require("../middleware/authMiddleware");
 
-router.post("/register", registerCoach);
+router.post("/", registerCoach);
 router.post("/assign-company", authMiddleware, assignCompany);
 router.get("/getAll", authMiddleware, getAllCoaches);
 

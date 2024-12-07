@@ -1,30 +1,52 @@
-import React, { useState } from 'react';
+// src/pages/Miscellaneous/Settings/Settings.js
+import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Form, Button, Container, Row, Col, Image } from 'react-bootstrap';
+import { Form, Button, Container, Alert } from 'react-bootstrap';
 import Navbar from "../../../Components/Navbar/Navbar";
+import { updateSettings, changePassword, clearSettingsStatus } from '../../../redux/slices/settingsSlice';
 
 const Settings = () => {
-  // const user = useSelector(state => state.auth.user);
-  // const userRole = useSelector(state => state.auth.role);
-  // const dispatch = useDispatch();
-
-  const userRole = "hr";
-  const user = {};
+  const dispatch = useDispatch();
+  const { user, role } = useSelector(state => state.auth);
+  const { loading, error, success, passwordChangeSuccess } = useSelector(state => state.settings);
 
   const [formData, setFormData] = useState({
-    profilePicture: user.profilePicture || '',
-    fullName: user.fullName || '',
-    phoneNumber: user.phoneNumber || '',
-    domain: user.domain || '',
-    oldPassword: '',
-    newPassword: '',
-    confirmPassword: '',
-    emergencyContact: userRole === 'employee' ? (user.emergencyContact || {
+    fullName: user?.fullName || '',
+    phone: user?.phone || '',
+    domain: user?.domain || '',
+    specialization: user?.specialization || '',
+    emergencyContact: role === 'employee' ? (user?.emergencyContact || {
       name: '',
       email: '',
       phone: ''
-    }) : null
+    }) : null,
+    oldPassword: '',
+    newPassword: '',
+    confirmPassword: ''
   });
+
+  useEffect(() => {
+    // Reset form when user data changes
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        fullName: user.fullName || '',
+        phone: user.phone || '',
+        domain: user.domain || '',
+        specialization: user.specialization || '',
+        emergencyContact: role === 'employee' ? (user.emergencyContact || {
+          name: '',
+          email: '',
+          phone: ''
+        }) : null
+      }));
+    }
+
+    // Clear settings status on component unmount
+    return () => {
+      dispatch(clearSettingsStatus());
+    };
+  }, [user, role, dispatch]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -45,85 +67,56 @@ const Settings = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (formData.newPassword !== formData.confirmPassword) {
-      alert("Passwords don't match!");
-      return;
+    dispatch(clearSettingsStatus());
+
+    // Handle password change if provided
+    if (formData.oldPassword && formData.newPassword) {
+      if (formData.newPassword !== formData.confirmPassword) {
+        dispatch({ type: 'settings/rejected', payload: "New passwords don't match" });
+        return;
+      }
+
+      try {
+        await dispatch(changePassword({
+          oldPassword: formData.oldPassword,
+          newPassword: formData.newPassword
+        })).unwrap();
+
+        // Clear password fields
+        setFormData(prev => ({
+          ...prev,
+          oldPassword: '',
+          newPassword: '',
+          confirmPassword: ''
+        }));
+      } catch (error) {
+        // Error is handled by the slice
+        return;
+      }
     }
-    // dispatch({ 
-    //   type: 'UPDATE_USER_SETTINGS', 
-    //   payload: formData 
-    // });
+
+    // Update other settings
+    const settingsData = {
+      fullName: formData.fullName,
+      phone: formData.phone,
+      ...(role === 'employee' && {
+        domain: formData.domain,
+        emergencyContact: formData.emergencyContact
+      }),
+      ...(role === 'coach' && {
+        specialization: formData.specialization
+      })
+    };
+
+    dispatch(updateSettings(settingsData));
   };
 
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    setFormData(prev => ({
-      ...prev,
-      profilePicture: URL.createObjectURL(file)
-    }));
-  };
-
-  return (
-    <div>
-      <Navbar/>
-      <Container>
-      
-      <div class="p-5">
-      <br/><br/>
-      <h2>Settings</h2>
-      <br/>
-      <Form onSubmit={handleSubmit}>
-        <Row className="mb-4">
-          <Col md={3}>
-            <Image 
-              src={formData.profilePicture || "/api/placeholder/150/150"} 
-              roundedCircle 
-              width={150} 
-              height={150}
-            />
-            <Form.Control 
-              type="file" 
-              accept="image/*"
-              onChange={handleImageUpload}
-              className="mt-2"
-            />
-          </Col>
-          <Col md={9}>
-            <Form.Group className="mb-3">
-              <Form.Label>Company</Form.Label>
-              <Form.Control type="text" value={user.company} disabled />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Email</Form.Label>
-              <Form.Control type="email" value={user.email} disabled />
-            </Form.Group>
-          </Col>
-        </Row>
-
-        <Form.Group className="mb-3">
-          <Form.Label>Full Name</Form.Label>
-          <Form.Control
-            type="text"
-            name="fullName"
-            value={formData.fullName}
-            onChange={handleChange}
-          />
-        </Form.Group>
-
-        <Form.Group className="mb-3">
-          <Form.Label>Phone Number</Form.Label>
-          <Form.Control
-            type="tel"
-            name="phoneNumber"
-            value={formData.phoneNumber}
-            onChange={handleChange}
-            placeholder="Optional"
-          />
-        </Form.Group>
-
-        {userRole === 'employee' && (
+  const renderRoleSpecificFields = () => {
+    switch (role) {
+      case 'employee':
+        return (
           <>
             <Form.Group className="mb-3">
               <Form.Label>Domain</Form.Label>
@@ -133,9 +126,9 @@ const Settings = () => {
                 onChange={handleChange}
               >
                 <option value="">Select Domain</option>
-                <option value="engineering">Engineering</option>
-                <option value="marketing">Marketing</option>
-                <option value="sales">Sales</option>
+                <option value="Engineering">Engineering</option>
+                <option value="Marketing">Marketing</option>
+                <option value="Sales">Sales</option>
               </Form.Select>
             </Form.Group>
 
@@ -146,7 +139,7 @@ const Settings = () => {
                 <Form.Control
                   type="text"
                   name="emergency.name"
-                  value={formData.emergencyContact.name}
+                  value={formData.emergencyContact?.name}
                   onChange={handleChange}
                 />
               </Form.Group>
@@ -155,7 +148,7 @@ const Settings = () => {
                 <Form.Control
                   type="email"
                   name="emergency.email"
-                  value={formData.emergencyContact.email}
+                  value={formData.emergencyContact?.email}
                   onChange={handleChange}
                 />
               </Form.Group>
@@ -164,53 +157,137 @@ const Settings = () => {
                 <Form.Control
                   type="tel"
                   name="emergency.phone"
-                  value={formData.emergencyContact.phone}
+                  value={formData.emergencyContact?.phone}
                   onChange={handleChange}
                 />
               </Form.Group>
             </div>
           </>
-        )}
+        );
+      case 'coach':
+        return (
+          <Form.Group className="mb-3">
+            <Form.Label>Specialization</Form.Label>
+            <Form.Select
+              name="specialization"
+              value={formData.specialization}
+              onChange={handleChange}
+            >
+              <option value="">Select Specialization</option>
+              <option value="Therapy">Therapy</option>
+              <option value="Music Therapy">Music Therapy</option>
+              <option value="Art Therapy">Art Therapy</option>
+              <option value="Meditation">Meditation</option>
+              <option value="Yoga">Yoga</option>
+            </Form.Select>
+          </Form.Group>
+        );
+      default:
+        return null;
+    }
+  };
 
+  return (
+    <div>
+      <Navbar />
+      <Container>
+        <div className="p-5">
+          <br /><br />
+          <h2>Settings</h2>
+          <br />
 
+          {error && <Alert variant="danger">{error}</Alert>}
+          {success && <Alert variant="success">Settings updated successfully!</Alert>}
+          {passwordChangeSuccess && <Alert variant="success">Password updated successfully!</Alert>}
 
-        <h4>Change Password</h4>
-        <Form.Group className="mb-3">
-          <Form.Label>Old Password</Form.Label>
-          <Form.Control
-            type="password"
-            name="oldPassword"
-            value={formData.oldPassword}
-            onChange={handleChange}
-          />
-        </Form.Group>
+          <Form onSubmit={handleSubmit}>
+            <Form.Group className="mb-3">
+              <Form.Label>Company</Form.Label>
+              <Form.Control 
+                type="text" 
+                value={user?.company?.name || ''} 
+                disabled 
+              />
+            </Form.Group>
 
-        <Form.Group className="mb-3">
-          <Form.Label>New Password</Form.Label>
-          <Form.Control
-            type="password"
-            name="newPassword"
-            value={formData.newPassword}
-            onChange={handleChange}
-          />
-        </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Email</Form.Label>
+              <Form.Control 
+                type="email" 
+                value={user?.email || ''} 
+                disabled 
+              />
+            </Form.Group>
 
-        <Form.Group className="mb-3">
-          <Form.Label>Confirm New Password</Form.Label>
-          <Form.Control
-            type="password"
-            name="confirmPassword"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-          />
-        </Form.Group>
+            {role !== 'admin' && (
+              <>
+                <Form.Group className="mb-3">
+                  <Form.Label>Full Name</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="fullName"
+                    value={formData.fullName}
+                    onChange={handleChange}
+                  />
+                </Form.Group>
 
-        <Button variant="primary" type="submit" className='w-auto'>
-          Save Changes
-        </Button>
-      </Form>
-      </div>
-    </Container>
+                <Form.Group className="mb-3">
+                  <Form.Label>Phone Number</Form.Label>
+                  <Form.Control
+                    type="tel"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    placeholder="Optional"
+                  />
+                </Form.Group>
+              </>
+            )}
+
+            {renderRoleSpecificFields()}
+
+            <h4>Change Password</h4>
+            <Form.Group className="mb-3">
+              <Form.Label>Current Password</Form.Label>
+              <Form.Control
+                type="password"
+                name="oldPassword"
+                value={formData.oldPassword}
+                onChange={handleChange}
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Label>New Password</Form.Label>
+              <Form.Control
+                type="password"
+                name="newPassword"
+                value={formData.newPassword}
+                onChange={handleChange}
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Label>Confirm New Password</Form.Label>
+              <Form.Control
+                type="password"
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+              />
+            </Form.Group>
+
+            <Button 
+              variant="primary" 
+              type="submit" 
+              className='w-auto'
+              disabled={loading}
+            >
+              {loading ? 'Saving...' : 'Save Changes'}
+            </Button>
+          </Form>
+        </div>
+      </Container>
     </div>
   );
 };
