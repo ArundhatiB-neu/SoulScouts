@@ -242,6 +242,19 @@ const Home = () => {
         </Container>
       </div> */}
       </div>
+      <footer className="bg-dark text-white py-4">
+      <Container className="d-flex justify-content-center">
+        <Row className="justify-content-between text-center">
+        <Col md={12} className="text-md-right">
+            <a href="#" className="btn btn-primary btn-sm w-auto">SIGN UP</a>
+          </Col>
+          <Col md={12} className="text-md-left m-3" >
+            <p className="mb-0">&copy; 2020 Copyright: MDBootstrap.com</p>
+          </Col>
+          
+        </Row>
+      </Container>
+    </footer>
     </div>
   );
 };
