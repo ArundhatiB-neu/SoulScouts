@@ -3,7 +3,13 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const path = require("path");
 
-// Import route modules
+const app = express();
+
+// Move all middleware to top
+app.use(bodyParser.json());
+app.use(cors());
+
+// Import route modules after middleware setup
 const hrRoutes = require("./routes/hrRoutes");
 const employeeRoutes = require("./routes/employeeRoutes");
 const coachRoutes = require("./routes/coachRoutes");
@@ -14,12 +20,11 @@ const companyRoutes = require("./routes/companyRoutes");
 const wellnessSurveyRoutes = require("./routes/wellnessSurveyRoutes");
 const resourceRoutes = require("./routes/resourceRoutes");
 const settingsRoutes = require('./routes/settingsRoutes');
+const userRoutes = require('./routes/userRoutes');
 
-const app = express();
-
-// Middleware
-app.use(bodyParser.json());
-app.use(cors());
+// Then define routes
+// Move user routes with other protected routes
+app.use("/api/user", userRoutes); // Remove duplicate authenticateToken since it's in the route
 
 // Public Routes (no authentication required)
 app.use("/api/register/hr", hrRoutes);

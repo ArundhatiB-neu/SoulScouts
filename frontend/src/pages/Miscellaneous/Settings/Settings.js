@@ -5,21 +5,34 @@ import { Form, Button, Container, Alert } from 'react-bootstrap';
 import Navbar from "../../../Components/Navbar/Navbar";
 import { updateSettings, changePassword, clearSettingsStatus } from '../../../redux/slices/settingsSlice';
 
+import { fetchUserData } from '../../../redux/slices/authSlice';
+
 const Settings = () => {
   const dispatch = useDispatch();
   const { user, role } = useSelector(state => state.auth);
   const { loading, error, success, passwordChangeSuccess } = useSelector(state => state.settings);
+  const authState = useSelector(state => state.auth);
+console.log('Auth state:', authState);
+console.log('User data:', authState.user);
+
+useEffect(() => {
+  const token = localStorage.getItem('token');
+  console.log('Current token in localStorage:', token);
+  
+  if (!user) {
+    console.log('About to fetch user data with token...');
+    dispatch(fetchUserData())
+      .unwrap()
+      .then(data => console.log('Fetch successful:', data))
+      .catch(err => console.error('Fetch failed:', err));
+  }
+}, [dispatch, user]);
 
   const [formData, setFormData] = useState({
     fullName: user?.fullName || '',
     phone: user?.phone || '',
     domain: user?.domain || '',
     specialization: user?.specialization || '',
-    emergencyContact: role === 'employee' ? (user?.emergencyContact || {
-      name: '',
-      email: '',
-      phone: ''
-    }) : null,
     oldPassword: '',
     newPassword: '',
     confirmPassword: ''
@@ -34,11 +47,6 @@ const Settings = () => {
         phone: user.phone || '',
         domain: user.domain || '',
         specialization: user.specialization || '',
-        emergencyContact: role === 'employee' ? (user.emergencyContact || {
-          name: '',
-          email: '',
-          phone: ''
-        }) : null
       }));
     }
 
@@ -50,41 +58,57 @@ const Settings = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (name.includes('emergency')) {
-      const [_, field] = name.split('.');
-      setFormData(prev => ({
-        ...prev,
-        emergencyContact: {
-          ...prev.emergencyContact,
-          [field]: value
-        }
-      }));
-    } else {
-      setFormData(prev => ({
-        ...prev,
-        [name]: value
-      }));
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const validatePasswordForm = () => {
+    if (!formData.oldPassword) {
+      dispatch({ type: 'settings/rejected', payload: "Current password is required" });
+      return false;
     }
+    
+    if (!formData.newPassword) {
+      dispatch({ type: 'settings/rejected', payload: "New password is required" });
+      return false;
+    }
+  
+    if (formData.newPassword !== formData.confirmPassword) {
+      dispatch({ type: 'settings/rejected', payload: "New passwords don't match" });
+      return false;
+    }
+  
+    // Password strength validation
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    if (!passwordRegex.test(formData.newPassword)) {
+      dispatch({ 
+        type: 'settings/rejected', 
+        payload: "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character"
+      });
+      return false;
+    }
+  
+    return true;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     dispatch(clearSettingsStatus());
-
+  
     // Handle password change if provided
-    if (formData.oldPassword && formData.newPassword) {
-      if (formData.newPassword !== formData.confirmPassword) {
-        dispatch({ type: 'settings/rejected', payload: "New passwords don't match" });
+    if (formData.oldPassword || formData.newPassword || formData.confirmPassword) {
+      if (!validatePasswordForm()) {
         return;
       }
-
+  
       try {
         await dispatch(changePassword({
           oldPassword: formData.oldPassword,
           newPassword: formData.newPassword
         })).unwrap();
-
-        // Clear password fields
+  
         setFormData(prev => ({
           ...prev,
           oldPassword: '',
@@ -92,77 +116,30 @@ const Settings = () => {
           confirmPassword: ''
         }));
       } catch (error) {
-        // Error is handled by the slice
         return;
       }
     }
-
-    // Update other settings
-    const settingsData = {
-      fullName: formData.fullName,
-      phone: formData.phone,
-      ...(role === 'employee' && {
-        domain: formData.domain,
-        emergencyContact: formData.emergencyContact
-      }),
-      ...(role === 'coach' && {
-        specialization: formData.specialization
-      })
-    };
-
-    dispatch(updateSettings(settingsData));
+  
+    // ... rest of the settings update code
   };
 
   const renderRoleSpecificFields = () => {
     switch (role) {
       case 'employee':
         return (
-          <>
-            <Form.Group className="mb-3">
-              <Form.Label>Domain</Form.Label>
-              <Form.Select
-                name="domain"
-                value={formData.domain}
-                onChange={handleChange}
-              >
-                <option value="">Select Domain</option>
-                <option value="Engineering">Engineering</option>
-                <option value="Marketing">Marketing</option>
-                <option value="Sales">Sales</option>
-              </Form.Select>
-            </Form.Group>
-
-            <div className="mb-4">
-              <h4>Emergency Contact</h4>
-              <Form.Group className="mb-3">
-                <Form.Label>Name</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="emergency.name"
-                  value={formData.emergencyContact?.name}
-                  onChange={handleChange}
-                />
-              </Form.Group>
-              <Form.Group className="mb-3">
-                <Form.Label>Email</Form.Label>
-                <Form.Control
-                  type="email"
-                  name="emergency.email"
-                  value={formData.emergencyContact?.email}
-                  onChange={handleChange}
-                />
-              </Form.Group>
-              <Form.Group className="mb-3">
-                <Form.Label>Phone</Form.Label>
-                <Form.Control
-                  type="tel"
-                  name="emergency.phone"
-                  value={formData.emergencyContact?.phone}
-                  onChange={handleChange}
-                />
-              </Form.Group>
-            </div>
-          </>
+          <Form.Group className="mb-3">
+            <Form.Label>Domain</Form.Label>
+            <Form.Select
+              name="domain"
+              value={formData.domain}
+              onChange={handleChange}
+            >
+              <option value="">Select Domain</option>
+              <option value="Engineering">Engineering</option>
+              <option value="Marketing">Marketing</option>
+              <option value="Sales">Sales</option>
+            </Form.Select>
+          </Form.Group>
         );
       case 'coach':
         return (

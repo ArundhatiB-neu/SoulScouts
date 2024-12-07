@@ -1,5 +1,38 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
+export const fetchUserData = createAsyncThunk(
+  'auth/fetchUserData',
+  async (_, { getState, rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('token');
+      
+      // Add token validation
+      if (!token) {
+        return rejectWithValue('No authentication token found');
+      }
+
+      const response = await fetch('http://localhost:5001/api/user/profile', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`, // Make sure space after 'Bearer'
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return rejectWithValue(errorData.error || 'Failed to fetch user data');
+      }
+
+      const data = await response.json();
+      return data.user;
+    } catch (error) {
+      console.error('Fetch user data error:', error);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 // Async thunk for signup
 export const signupUser = createAsyncThunk(
   'auth/signup',
@@ -139,9 +172,15 @@ const authSlice = createSlice({
     resetRegistrationSuccess: (state) => {
       state.registrationSuccess = false;
     },
+    updateUserInStore: (state, action) => {
+      state.user = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
+    .addCase(fetchUserData.fulfilled, (state, action) => {
+      state.user = action.payload;
+    })
       // Signup cases
       .addCase(signupUser.pending, (state) => {
         state.loading = true;
@@ -219,7 +258,7 @@ const authSlice = createSlice({
   },
 });
 
-export const { clearError, resetRegistrationSuccess } = authSlice.actions;
+export const { clearError, resetRegistrationSuccess, updateUserInStore } = authSlice.actions;
 
 // Selectors
 export const selectAuth = (state) => state.auth;

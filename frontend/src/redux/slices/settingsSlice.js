@@ -1,13 +1,18 @@
 // src/redux/slices/settingsSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { updateUserInStore } from './authSlice'; // Import to update user in auth state
 
-// Async thunk for updating settings
 export const updateSettings = createAsyncThunk(
   'settings/updateSettings',
-  async (formData, { rejectWithValue }) => {
+  async (formData, { rejectWithValue, dispatch }) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5001/settings/update', {
+      console.log('Sending update settings request with:', {
+        formData,
+        token: token ? 'Present' : 'Missing'
+      });
+
+      const response = await fetch('http://localhost:5001/api/settings/update', {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -18,24 +23,37 @@ export const updateSettings = createAsyncThunk(
 
       if (!response.ok) {
         const errorData = await response.json();
+        console.error('Settings update failed:', errorData);
         return rejectWithValue(errorData.error);
       }
 
       const data = await response.json();
+      console.log('Settings update successful:', data);
+      
+      if (data.user) {
+        dispatch(updateUserInStore(data.user));
+      }
       return data;
     } catch (error) {
+      console.error('Settings update error:', error);
       return rejectWithValue(error.message);
     }
   }
 );
 
-// Async thunk for changing password
 export const changePassword = createAsyncThunk(
   'settings/changePassword',
   async ({ oldPassword, newPassword }, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5001/settings/change-password', {
+      console.log('Initiating password change request...');
+
+      if (!token) {
+        console.error('No token found');
+        return rejectWithValue('Authentication token missing');
+      }
+
+      const response = await fetch('http://localhost:5001/api/settings/change-password', {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -44,14 +62,18 @@ export const changePassword = createAsyncThunk(
         body: JSON.stringify({ oldPassword, newPassword }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        const errorData = await response.json();
-        return rejectWithValue(errorData.error);
+        console.error('Password change failed:', data);
+        return rejectWithValue(data.error || 'Failed to change password');
       }
 
-      return await response.json();
+      console.log('Password change successful');
+      return data;
     } catch (error) {
-      return rejectWithValue(error.message);
+      console.error('Password change error:', error);
+      return rejectWithValue(error.message || 'An error occurred while changing password');
     }
   }
 );
@@ -73,13 +95,12 @@ const settingsSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Update settings cases
       .addCase(updateSettings.pending, (state) => {
         state.loading = true;
         state.error = null;
         state.success = false;
       })
-      .addCase(updateSettings.fulfilled, (state, action) => {
+      .addCase(updateSettings.fulfilled, (state) => {
         state.loading = false;
         state.success = true;
         state.error = null;
@@ -89,7 +110,6 @@ const settingsSlice = createSlice({
         state.error = action.payload;
         state.success = false;
       })
-      // Change password cases
       .addCase(changePassword.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -109,5 +129,4 @@ const settingsSlice = createSlice({
 });
 
 export const { clearSettingsStatus } = settingsSlice.actions;
-
 export default settingsSlice.reducer;
