@@ -1,15 +1,23 @@
 const Employee = require("../models/Employee");
 const Company = require("../models/Company");
 const bcrypt = require("bcrypt");
+const Coach = require("../models/Coach");
 
 exports.registerEmployee = async (req, res) => {
-  const { fullName, company, email, domain, phone, password, confirmPassword } =
-    req.body;
+  const {
+    fullName,
+    companyId,
+    email,
+    domain,
+    phone,
+    password,
+    confirmPassword,
+  } = req.body;
 
   // Validate required fields
   if (
     !fullName ||
-    !company ||
+    !companyId ||
     !email ||
     !domain ||
     !password ||
@@ -20,38 +28,6 @@ exports.registerEmployee = async (req, res) => {
       .json({ error: "All fields except phone are required." });
   }
 
-  // Full name validation: letters and spaces only
-  const fullNameRegex = /^[a-zA-Z\s]+$/;
-  if (!fullNameRegex.test(fullName)) {
-    return res
-      .status(400)
-      .json({ error: "Full name can only contain letters and spaces." });
-  }
-
-  // Email validation: general email pattern
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-  if (!emailRegex.test(email)) {
-    return res.status(400).json({ error: "Invalid email format." });
-  }
-
-  // Phone validation: optional but must be a valid US phone number if provided
-  const phoneRegex = /^(\+1|1)?\d{10}$/;
-  if (phone && !phoneRegex.test(phone)) {
-    return res.status(400).json({
-      error: "Invalid phone number. Must be a valid US phone number.",
-    });
-  }
-
-  // Password validation: strong password (minimum 8 characters, 1 uppercase, 1 lowercase, 1 digit, 1 special character)
-  const passwordRegex =
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-  if (!passwordRegex.test(password)) {
-    return res.status(400).json({
-      error:
-        "Password must be at least 8 characters long and include one uppercase letter, one lowercase letter, one number, and one special character.",
-    });
-  }
-
   // Validate password match
   if (password !== confirmPassword) {
     return res.status(400).json({ error: "Passwords do not match." });
@@ -59,10 +35,10 @@ exports.registerEmployee = async (req, res) => {
 
   try {
     // Check if company exists
-    const companyExists = await Company.findOne({ name: company });
+    const companyExists = await Company.findById(companyId);
     if (!companyExists) {
       return res
-        .status(400)
+        .status(404)
         .json({ error: "Company not found. Please contact your admin." });
     }
 
@@ -80,7 +56,7 @@ exports.registerEmployee = async (req, res) => {
     // Create new employee
     const newEmployee = new Employee({
       fullName,
-      company,
+      company: companyId,
       email,
       domain,
       phone,
@@ -180,29 +156,41 @@ exports.updateEmployee = async (req, res) => {
 
 // Get all employees by company name
 exports.getAllEmployees = async (req, res) => {
-  const { company } = req.query; // getting name form query param
+  const { companyId } = req.query; // Company ID passed as a query parameter
 
   try {
-    if (!company) {
-      return res.status(400).json({ error: "Company name is required." });
+    // Validate if companyId is provided
+    if (!companyId) {
+      return res.status(400).json({ error: "Company ID is required." });
     }
 
-    const employees = await Employee.find({ company }).select("-password");
+    // Fetch all employees associated with the company, populating company and coach details
+    const employees = await Employee.find({ company: companyId })
+      .populate("company", "name domain") // Populate company details
+      .populate("coach", "fullName email specialization"); // Populate coach details if present
+
+    // Check if employees exist
     if (!employees || employees.length === 0) {
       return res
         .status(404)
         .json({ error: "No employees found for this company." });
     }
 
+    // Return employees excluding their passwords
+    const filteredEmployees = employees.map((employee) => {
+      const { password, ...rest } = employee._doc;
+      return rest;
+    });
+
     res.status(200).json({
       message: "Employees retrieved successfully.",
-      employees,
+      employees: filteredEmployees,
     });
   } catch (error) {
     console.error(error);
-    res
-      .status(500)
-      .json({ error: "An error occurred while fetching employees." });
+    res.status(500).json({
+      error: "An error occurred while fetching employees.",
+    });
   }
 };
 
@@ -232,3 +220,41 @@ exports.deleteEmployees = async (req, res) => {
   }
 };
 
+exports.assignCoach = async (req, res) => {
+  const { employeeId, coachId } = req.body;
+
+  try {
+    // Validate if both IDs are provided
+    if (!employeeId || !coachId) {
+      return res
+        .status(400)
+        .json({ error: "Employee ID and Coach ID are required." });
+    }
+
+    // Check if employee exists
+    const employee = await Employee.findById(employeeId);
+    if (!employee) {
+      return res.status(404).json({ error: "Employee not found." });
+    }
+
+    // Check if coach exists
+    const coach = await Coach.findById(coachId);
+    if (!coach) {
+      return res.status(404).json({ error: "Coach not found." });
+    }
+
+    // Assign the coach to the employee
+    employee.coach = coachId;
+    const updatedEmployee = await employee.save();
+
+    res.status(200).json({
+      message: "Coach assigned to employee successfully.",
+      employee: updatedEmployee,
+    });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while assigning the coach." });
+  }
+};

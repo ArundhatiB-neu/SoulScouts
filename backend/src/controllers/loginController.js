@@ -21,8 +21,10 @@ exports.loginUser = async (req, res) => {
 
   try {
     // Check if the user exists in all collections
-    const user =
-      (await Employee.findOne({ email })) ||
+    let user =
+      (await Employee.findOne({ email })
+        .populate("company", "name domain")
+        .populate("coach", "fullName email specialization")) ||
       (await HR.findOne({ email })) ||
       (await Coach.findOne({ email }));
 
@@ -68,14 +70,23 @@ exports.loginUser = async (req, res) => {
 
     await newSession.save();
 
+    // Prepare the response based on user type
+    let responseUser = {
+      id: user._id,
+      fullName: user.fullName,
+      email: user.email,
+      type: user.constructor.modelName,
+    };
+
+    // including company and coach details for employees
+    if (user.constructor.modelName === "Employee") {
+      responseUser.company = user.company; // Populated company details
+      responseUser.coach = user.coach; // Populated coach details, if any
+    }
+
     res.status(200).json({
       message: "Login successful.",
-      user: {
-        id: user._id,
-        fullName: user.fullName,
-        email: user.email,
-        type: user.constructor.modelName,
-      },
+      user: responseUser,
       token,
     });
   } catch (error) {

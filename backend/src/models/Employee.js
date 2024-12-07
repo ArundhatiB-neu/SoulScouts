@@ -7,7 +7,8 @@ const employeeSchema = new mongoose.Schema({
     match: /^[a-zA-Z\s]{2,50}$/,
   },
   company: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Company",
     required: true,
   },
   email: {
@@ -28,6 +29,11 @@ const employeeSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
+  },
+  coach: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Coach",
+    required: false,
   },
   createdAt: {
     type: Date,

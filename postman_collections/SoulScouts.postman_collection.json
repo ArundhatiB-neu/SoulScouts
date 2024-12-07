@@ -13,7 +13,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"fullName\": \"John Doe\",\n  \"email\": \"john.doe@company.com\",\n  \"phone\": \"1234567890\",\n  \"companyName\": \"Tech Corp\",\n  \"domain\": \"@company.com\",\n  \"password\": \"SecureP@ssw0rd\",\n  \"confirmPassword\": \"SecureP@ssw0rd\"\n}",
+					"raw": "{\n  \"fullName\": \"Heather Kelley\",\n  \"email\": \"kelly.h@dailyplanet.com\",\n  \"phone\": \"1234567890\",\n  \"companyName\": \"Daily Planet\",\n  \"domain\": \"@dailyplanet.com\",\n  \"password\": \"SecureP@ssw0rd\",\n  \"confirmPassword\": \"SecureP@ssw0rd\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -42,7 +42,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"fullName\": \"Jane Doe todelete\",\n  \"company\": \"Tech Corp\",\n  \"email\": \"jane.doe.todelete@company.com\",\n  \"domain\": \"@company.com\",\n  \"phone\": \"+11234567890\",\n  \"password\": \"StrongP@ssw0rd\",\n  \"confirmPassword\": \"StrongP@ssw0rd\"\n}",
+					"raw": "{\n  \"fullName\": \"alfred\",\n  \"companyId\": \"67538c35010a53a4fb86f685\",\n  \"email\": \"butler@wayne.com\",\n  \"domain\": \"@wayne.com\",\n  \"phone\": \"+11234567890\",\n  \"password\": \"StrongP@ssw0rd\",\n  \"confirmPassword\": \"StrongP@ssw0rd\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -71,7 +71,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"fullName\": \"Coach Doe\",\n  \"email\": \"coach.doe@soulscouts.com\",\n  \"phone\": \"+12345678900\",\n  \"specialization\": \"Leadership Development\",\n  \"password\": \"StrongP@ssw0rd\",\n  \"confirmPassword\": \"StrongP@ssw0rd\"\n}",
+					"raw": "{\n  \"fullName\": \"Hannah Sanders\",\n  \"email\": \"hannah.sanders@soulscouts.com\",\n  \"phone\": \"+12345678900\",\n  \"specialization\": \"Leadership Development\",\n  \"password\": \"StrongP@ssw0rd\",\n  \"confirmPassword\": \"StrongP@ssw0rd\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -79,15 +79,15 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:5001/register/coach",
+					"raw": "http://localhost:5001/coach/register",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "5001",
 					"path": [
-						"register",
-						"coach"
+						"coach",
+						"register"
 					]
 				}
 			},
@@ -100,7 +100,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"email\": \"jane.doe.two@company.com\",\n  \"password\": \"Strong@Password1234\"\n}",
+					"raw": "{\n  \"email\": \"butler@wayne.com\",\n  \"password\": \"StrongP@ssw0rd\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -204,7 +204,7 @@
 					"bearer": [
 						{
 							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3NTMzM2JiNjg5YzljNjEyNjBlNTQ0MiIsInR5cGUiOiJFbXBsb3llZSIsImlhdCI6MTczMzUwNzA0NywiZXhwIjoxNzMzNTA3OTQ3fQ.54Q6XYBDtlIuebHlk1AdQgALqiIiE__5uXV3OE1a66k",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3NTMzM2JiNjg5YzljNjEyNjBlNTQ0MiIsInR5cGUiOiJFbXBsb3llZSIsImlhdCI6MTczMzUyOTg4MywiZXhwIjoxNzMzNTMwNzgzfQ.ODYZxaA1xTOi1ANmB6LMRRibffWokPKkP72118WxA_c",
 							"type": "string"
 						}
 					]
@@ -212,7 +212,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:5001/employee/getAll?company=Tech%20Corp",
+					"raw": "http://localhost:5001/employee/getAll?companyId=67538c35010a53a4fb86f685",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -224,8 +224,8 @@
 					],
 					"query": [
 						{
-							"key": "company",
-							"value": "Tech%20Corp"
+							"key": "companyId",
+							"value": "67538c35010a53a4fb86f685"
 						}
 					]
 				}
@@ -258,6 +258,170 @@
 						"employee",
 						"delete",
 						"675338c5cdb640b2c9af1d67"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "company getAll",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5001/company/getAll",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"company",
+						"getAll"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "assign company to coach",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3NTMzM2JiNjg5YzljNjEyNjBlNTQ0MiIsInR5cGUiOiJFbXBsb3llZSIsImlhdCI6MTczMzUyODgyOSwiZXhwIjoxNzMzNTI5NzI5fQ.ypGYZQ8wIVOf9JtBjAUkBqnJyqlCI5l7-drQugf39xM",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"coachId\": \"67538b82010a53a4fb86f672\",\n  \"companyId\": \"67538c35010a53a4fb86f685\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5001/coach/assign-company",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"coach",
+						"assign-company"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Coach getAll",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3NTMzM2JiNjg5YzljNjEyNjBlNTQ0MiIsInR5cGUiOiJFbXBsb3llZSIsImlhdCI6MTczMzUyODgyOSwiZXhwIjoxNzMzNTI5NzI5fQ.ypGYZQ8wIVOf9JtBjAUkBqnJyqlCI5l7-drQugf39xM",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5001/coach/getAll",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"coach",
+						"getAll"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Coach getAll company filter",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3NTMzM2JiNjg5YzljNjEyNjBlNTQ0MiIsInR5cGUiOiJFbXBsb3llZSIsImlhdCI6MTczMzUyOTg4MywiZXhwIjoxNzMzNTMwNzgzfQ.ODYZxaA1xTOi1ANmB6LMRRibffWokPKkP72118WxA_c",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5001/coach/getAll?company=67538c35010a53a4fb86f685",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"coach",
+						"getAll"
+					],
+					"query": [
+						{
+							"key": "company",
+							"value": "67538c35010a53a4fb86f685"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "employee assign coach",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3NTMzM2JiNjg5YzljNjEyNjBlNTQ0MiIsInR5cGUiOiJFbXBsb3llZSIsImlhdCI6MTczMzUyOTg4MywiZXhwIjoxNzMzNTMwNzgzfQ.ODYZxaA1xTOi1ANmB6LMRRibffWokPKkP72118WxA_c",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"employeeId\": \"675393468d3ae090f06597c9\",\n  \"coachId\": \"67538b82010a53a4fb86f672\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5001/employee/assign-coach",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"employee",
+						"assign-coach"
 					]
 				}
 			},
