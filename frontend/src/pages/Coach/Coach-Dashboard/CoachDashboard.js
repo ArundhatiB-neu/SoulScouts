@@ -65,7 +65,7 @@ const CoachDashboard = () => {
             department: "Marketing",
             data: [
               {
-                date: "2024-11-28",
+                date: "2024-11-27",
                 physical: 5.5,
                 mental: 5.4,
                 workLife: 5.6,
@@ -74,6 +74,42 @@ const CoachDashboard = () => {
                   physicalWellness: { energyLevel: "Good", sleepHours: "7-8" },
                   mentalWellness: { stressLevel: "Moderate", overwhelmedByWork: "Sometimes" },
                   workLifeBalance: { workBeyondOfficeHours: "Sometimes", disconnectFromWork: "Usually" }
+                }
+              },
+              {
+                date: "2024-11-28",
+                physical: 5.0,
+                mental: 4.2,
+                workLife: 5.4,
+                total: 14.6,
+                analytics: {
+                  physicalWellness: { energyLevel: "Excellent", sleepHours: "More than 8" },
+                  mentalWellness: { stressLevel: "Low", overwhelmedByWork: "Rarely" },
+                  workLifeBalance: { workBeyondOfficeHours: "Rarely", disconnectFromWork: "Very Effectively" }
+                }
+              },
+              {
+                date: "2024-11-29",
+                physical: 5.8,
+                mental: 5.2,
+                workLife: 5.4,
+                total: 16.4,
+                analytics: {
+                  physicalWellness: { energyLevel: "Excellent", sleepHours: "More than 8" },
+                  mentalWellness: { stressLevel: "Low", overwhelmedByWork: "Rarely" },
+                  workLifeBalance: { workBeyondOfficeHours: "Rarely", disconnectFromWork: "Very Effectively" }
+                }
+              },
+              {
+                date: "2024-11-30",
+                physical: 5.8,
+                mental: 5.2,
+                workLife: 5.4,
+                total: 16.4,
+                analytics: {
+                  physicalWellness: { energyLevel: "Excellent", sleepHours: "More than 8" },
+                  mentalWellness: { stressLevel: "Low", overwhelmedByWork: "Rarely" },
+                  workLifeBalance: { workBeyondOfficeHours: "Rarely", disconnectFromWork: "Very Effectively" }
                 }
               },
               // Add more dates for Jane Smith
