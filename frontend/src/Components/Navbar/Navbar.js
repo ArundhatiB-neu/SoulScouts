@@ -27,7 +27,7 @@ const Navigation = () => {
       { title: 'HR Settings', path: '/settings' },
       { title: 'Employee Management', path: '/employee-management' },
       { title: 'Resource Library', path: '/library' },
-      { title: 'Manage Subscription', path: '/subscription' }
+      // { title: 'Manage Subscription', path: '/subscription' }
     ],
     employee: [
       { title: 'Employee Dashboard', path: '/employee-dashboard' },

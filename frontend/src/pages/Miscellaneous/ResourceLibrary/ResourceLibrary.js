@@ -60,17 +60,17 @@ const ResourceLibrary = () => {
       <h1 class="text-center">Resource Library</h1>
       <div class="p-5">
       <div className="d-flex justify-content-between align-items-center mb-5">
-        {isAdmin && (
-          <Button 
-            variant="primary"
-            onClick={() => {
-              setSelectedResource(null);
-              setShowModal(true);
-            }}
-          >
-            Add Resource
-          </Button>
-        )}
+        {/* {isAdmin && (
+          // <Button 
+          //   variant="primary"
+          //   onClick={() => {
+          //     setSelectedResource(null);
+          //     setShowModal(true);
+          //   }}
+          // >
+          //   Add Resource
+          // </Button>
+        )} */}
         <Form.Select 
           className="category-select"
           value={selectedCategory}
@@ -99,7 +99,7 @@ const ResourceLibrary = () => {
               <Card.Body>
                 <Card.Title>{resource.title}</Card.Title>
                 <Card.Text>{resource.description}</Card.Text>
-                {isAdmin && (
+                {/* {isAdmin && (
                   <div className="mt-2">
                     <Button 
                       variant="outline-primary" 
@@ -117,7 +117,7 @@ const ResourceLibrary = () => {
                       Delete
                     </Button>
                   </div>
-                )}
+                )} */}
               </Card.Body>
             </Card>
           </Col>
